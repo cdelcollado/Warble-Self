@@ -1,0 +1,262 @@
+{
+  "app": {
+    "title": "Warble",
+    "subtitle": "Warble: radio programming for the web",
+    "beta": "BETA 0.9",
+    "tabs": {
+      "memory": "Memory",
+      "usb": "USB Connection",
+      "settings": "Settings"
+    },
+    "buttons": {
+      "openFile": "Open File (.img, .csv, .ddmr)",
+      "saveImg": "Save Image (.img)"
+    },
+    "sections": {
+      "file": "File"
+    },
+    "radioBar": {
+      "fileLoaded": "File loaded",
+      "noFile": "No file loaded",
+      "unsaved": "Unsaved changes"
+    },
+    "alerts": {
+      "importSuccess": "Successfully imported {{count}} channels from {{filename}}.",
+      "importError": "Failed to parse file: {{error}}"
+    },
+    "driverMismatch": {
+      "title": "File does not match the selected radio",
+      "message": "This file is for {{detected}}, but you have {{current}} selected. Do you want to switch and continue?",
+      "switchAndLoad": "Switch to {{model}} and load",
+      "cancel": "Cancel"
+    }
+  },
+  "radio": {
+    "panelTitle": "Serial Control Panel",
+    "panelSubtitle": "Connection & Protocol MVP",
+    "status": {
+      "idle": "Disconnected",
+      "connecting": "CONNECTING",
+      "connected": "CONNECTED",
+      "reading": "READING",
+      "writing": "WRITING",
+      "error": "ERROR"
+    },
+    "buttons": {
+      "connect": "Connect USB Cable",
+      "read": "Read from Radio",
+      "reading": "Reading memory block...",
+      "write": "Write to Radio",
+      "writing": "Writing to EEPROM..."
+    },
+    "progress": {
+      "reading": "Reading Progress",
+      "writing": "Writing Progress"
+    },
+    "ready": {
+      "title": "Device ready to operate",
+      "description": "Make sure your analog radio is turned on, volume at 100%, and firmly connected before starting the cloning process."
+    },
+    "errors": {
+      "noMemory": "No memory map preloaded. Do a read first."
+    },
+    "logs": {
+      "writeSuccess": "Hexadecimal with channels successfully uploaded to EEPROM!"
+    }
+  },
+  "grid": {
+    "buttons": {
+      "paste": "Paste from Excel",
+      "write": "Write to Radio",
+      "export": "Save .CSV",
+      "clear": "Clear",
+      "add": "Add Channel",
+      "addPmr": "Add PMR",
+      "delete": "Delete",
+      "clearAll": "Clear All"
+    },
+    "alerts": {
+      "pasteSuccess": "{{count}} channels successfully imported from clipboard.",
+      "pasteFallback": "Your browser blocks direct clipboard access. Press Ctrl+V instead of the button.",
+      "invalidFrequency": "Invalid frequency. It must be a valid number between 136-174 MHz (VHF) or 400-520 MHz (UHF).",
+      "outOfRange": "Frequency out of range for this radio",
+      "confirmClearAll": "Are you sure you want to delete ALL channels from the grid? This action cannot be undone."
+    },
+    "zones": {
+      "title": "Channel Groups:",
+      "all": "All Channels",
+      "z1": "Zone A (1-32)",
+      "z2": "Zone B (33-64)",
+      "z3": "Zone C (65-96)",
+      "z4": "Zone D (97-128)"
+    },
+    "columns": {
+      "loc": "Channel",
+      "frequency": "Frequency",
+      "name": "Name",
+      "toneMode": "Tone Mode",
+      "tone": "Tone",
+      "toneSql": "ToneSql",
+      "dtcsCode": "DTCS Code",
+      "rxDtcsCode": "RX DTCS Code",
+      "dtcsPol": "DTCS Pol",
+      "duplex": "Duplex",
+      "offset": "Offset",
+      "mode": "Mode",
+      "power": "Power",
+      "skip": "Skip",
+      "timeslot": "Timeslot",
+      "talkgroup": "TalkGroup"
+    }
+  },
+  "settings": {
+    "title": "Global Settings",
+    "noSettings": "No global settings available for this radio model.",
+    "on": "On",
+    "off": "Off",
+    "squelch": "Squelch Level",
+    "backlight": "Backlight Timeout (s)",
+    "beep": "Key Beep",
+    "voicePrompt": "Voice Prompt",
+    "step": "Frequency Step",
+    "save": "Battery Save",
+    "vox": "VOX Level",
+    "tdr": "Dual Watch (TDR)",
+    "timeout": "Time-Out Timer (TOT)",
+    "bcl": "Busy Channel Lockout",
+    "autolk": "Auto Keypad Lock",
+    "sftd": "Frequency Shift Direction",
+    "wtled": "Standby LED Color",
+    "rxled": "Receive LED Color",
+    "txled": "Transmit LED Color",
+    "almod": "Alarm Mode",
+    "band": "Default Band",
+    "tdrab": "Transmit under Dual Watch",
+    "ste": "Squelch Tail Elimination (STE)",
+    "rpste": "Repeater Squelch Tail Elimination",
+    "rptrl": "Repeater Squelch Tail Delay",
+    "ponmsg": "Power-on Message",
+    "roger": "Roger Beep",
+    "workmode": "Work Mode"
+  },
+  "language": {
+    "select": "Language",
+    "en": "English",
+    "es": "Español",
+    "ca": "Català"
+  },
+  "auth": {
+    "login": "Log in",
+    "register": "Register",
+    "logout": "Log out",
+    "email": "Email",
+    "password": "Password",
+    "callsign": "Callsign (optional)",
+    "loginTitle": "Welcome back",
+    "registerTitle": "Create account",
+    "checkEmail": "Check your email",
+    "loginButton": "Sign in",
+    "registerButton": "Create account",
+    "close": "Close",
+    "errors": {
+      "invalidCredentials": "Incorrect email or password.",
+      "emailTaken": "This email is already registered.",
+      "generic": "Something went wrong. Please try again."
+    },
+    "success": {
+      "registered": "Account created! Check your inbox to confirm your email before logging in.",
+      "loggedIn": "Welcome, {{name}}!",
+      "loggedOut": "Logged out."
+    }
+  },
+  "profile": {
+    "title": "My profile",
+    "callsign": "Callsign",
+    "callsignHint": "Your amateur radio callsign, shown next to your uploads.",
+    "country": "Country",
+    "save": "Save changes",
+    "saved": "Saved!",
+    "errors": {
+      "saveFailed": "Could not save profile. Please try again."
+    }
+  },
+  "repository": {
+    "tab": "Repository",
+    "title": "Codeplug Repository",
+    "subtitle": "Browse, share, and download radio configurations from the community.",
+    "loginToUpload": "Sign in to upload",
+    "createAccount": "Create a free account",
+    "searchPlaceholder": "Search by radio, region, callsign...",
+    "search": "Search",
+    "filterButton": "Filters",
+    "results": "{{count}} results",
+    "empty": "No codefiles found. Be the first to upload one!",
+    "page": "Page {{current}} of {{total}}",
+    "upload": {
+      "button": "Upload codeplug",
+      "title": "Upload codeplug",
+      "titleField": "Title",
+      "titlePlaceholder": "E.g. Catalonia - VHF/UHF Repeaters",
+      "description": "Description",
+      "descriptionPlaceholder": "Brief description of the contents (optional)",
+      "brand": "Brand",
+      "selectBrand": "Select brand",
+      "model": "Model",
+      "selectModel": "Select model",
+      "country": "Country",
+      "countryPlaceholder": "E.g. Spain",
+      "region": "Region",
+      "regionPlaceholder": "E.g. Catalonia (optional)",
+      "file": "File",
+      "filePlaceholder": "Select a .img or .csv file",
+      "invalidFormat": "Only .img or .csv files are accepted",
+      "autoDetected": "Radio auto-detected: {{brand}} {{model}}",
+      "submit": "Upload",
+      "uploading": "Uploading..."
+    },
+    "filter": {
+      "allBrands": "All brands",
+      "allModels": "All models",
+      "anyCountry": "Any country",
+      "sortBy": "Sort by",
+      "newest": "Newest",
+      "mostDownloaded": "Most downloaded",
+      "bestRated": "Best rated",
+      "clear": "Clear filters"
+    },
+    "card": {
+      "unknownAuthor": "Anonymous",
+      "downloads": "downloads",
+      "download": "Download",
+      "downloading": "Downloading...",
+      "loginToDownload": "Sign in to download",
+      "preview": "Preview"
+    },
+    "preview": {
+      "loading": "Loading channels...",
+      "channelCount": "{{count}} channels",
+      "loadToEditor": "Load to editor",
+      "unsupportedModel": "Preview not available for {{model}}",
+      "fetchError": "Error fetching file",
+      "decodeError": "Error decoding file"
+    },
+    "detail": {
+      "rating": "Rating",
+      "noRatings": "No ratings yet",
+      "yourRating": "Your rating",
+      "removeRating": "Remove",
+      "loginToRate": "Sign in to rate",
+      "reportCodefile": "Report",
+      "comments": "Comments",
+      "noComments": "No comments yet. Be the first!",
+      "commentPlaceholder": "Write a comment... (Ctrl+Enter to send)",
+      "replyPlaceholder": "Write a reply...",
+      "reply": "Reply",
+      "delete": "Delete",
+      "report": "Report",
+      "reportReason": "Reason for report (optional)...",
+      "reportConfirm": "Send report",
+      "loginToComment": "Sign in to comment"
+    }
+  }
+}

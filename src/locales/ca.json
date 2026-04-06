@@ -1,0 +1,263 @@
+{
+  "app": {
+    "title": "Warble",
+    "subtitle": "Warble: programació de ràdios per al web",
+    "beta": "BETA 0.9",
+    "tabs": {
+      "memory": "Memòria",
+      "usb": "Connexió USB",
+      "settings": "Configuració"
+    },
+    "buttons": {
+      "openFile": "Obrir Fitxer (.img, .csv, .ddmr)",
+      "saveImg": "Desar Imatge (.img)"
+    },
+    "sections": {
+      "file": "Arxiu"
+    },
+    "radioBar": {
+      "fileLoaded": "Fitxer carregat",
+      "noFile": "Cap fitxer carregat",
+      "unsaved": "Canvis pendents"
+    },
+    "alerts": {
+      "importSuccess": "S'han importat correctament {{count}} canals de l'arxiu {{filename}}.",
+      "importError": "Error en obrir el fitxer: {{error}}"
+    },
+    "driverMismatch": {
+      "title": "El fitxer no correspon a la ràdio seleccionada",
+      "message": "Aquest fitxer és per a {{detected}}, però tens seleccionat {{current}}. Vols canviar de ràdio i continuar?",
+      "switchAndLoad": "Canviar a {{model}} i carregar",
+      "cancel": "Cancel·lar"
+    }
+  },
+  "radio": {
+    "panelTitle": "Panell de Control Sèrie",
+    "panelSubtitle": "MVP Connexió & Protocol",
+    "status": {
+      "idle": "Desconnectat",
+      "connecting": "CONNECTANT",
+      "connected": "CONNECTAT",
+      "reading": "LLEGINT",
+      "writing": "ESCRIVINT",
+      "error": "ERROR"
+    },
+    "buttons": {
+      "connect": "Connectar Cable USB",
+      "read": "Llegir Dades (Read from Radio)",
+      "reading": "Llegint bloc de memòria...",
+      "write": "Escriure Dades (Write to Radio)",
+      "writing": "Gravant EEPROM..."
+    },
+    "progress": {
+      "reading": "Progrés de Lectura",
+      "writing": "Progrés d'Escriptura"
+    },
+    "ready": {
+      "title": "Dispositiu llest per operar",
+      "description": "Assegura't de tenir la ràdio analògica encesa, amb el volum al 100% i connectada fermament abans de començar la clonació."
+    },
+    "errors": {
+      "noMemory": "No hi ha cap mapa de memòria prèviament carregat. Fes una lectura primer."
+    },
+    "logs": {
+      "writeSuccess": "Hexadecimal amb els Canals inserits pujat a EEPROM amb èxit!"
+    }
+  },
+  "grid": {
+    "buttons": {
+      "paste": "Enganxar des d'Excel",
+      "write": "Escriure a Ràdio",
+      "export": "Desar .CSV",
+      "clear": "Buidar",
+      "add": "Afegir Canal",
+      "addPmr": "Afegir PMR",
+      "delete": "Eliminar",
+      "clearAll": "Buidar Tot"
+    },
+    "alerts": {
+      "pasteSuccess": "S'han importat {{count}} canals del portapapers correctament.",
+      "pasteFallback": "El teu navegador bloqueja l'accés directe al portapapers. Fes Ctrl+V enlloc d'apretar el botó.",
+      "invalidFrequency": "Freqüència invàlida. Ha de ser un número vàlid entre 136-174 MHz (VHF) o 400-520 MHz (UHF).",
+      "outOfRange": "Freqüència fora del rang d'aquesta ràdio",
+      "confirmClearAll": "Estàs segur que vols esborrar absolutament TOTS els canals de la graella? Aquesta acció no es pot desfer."
+    },
+    "zones": {
+      "title": "Grups de Canals:",
+      "all": "Tots els Canals",
+      "z1": "Zona A (1-32)",
+      "z2": "Zona B (33-64)",
+      "z3": "Zona C (65-96)",
+      "z4": "Zona D (97-128)"
+    },
+    "columns": {
+      "loc": "Canal",
+      "frequency": "Freqüència",
+      "name": "Nom",
+      "toneMode": "Mode To",
+      "tone": "To",
+      "toneSql": "ToSql",
+      "dtcsCode": "Codi DTCS",
+      "rxDtcsCode": "Codi RX DTCS",
+      "dtcsPol": "Pol DTCS",
+      "duplex": "Dúplex",
+      "offset": "Desplaçament",
+      "mode": "Mode",
+      "power": "Potència",
+      "skip": "Saltar",
+      "timeslot": "Timeslot",
+      "talkgroup": "TalkGroup"
+    }
+  },
+  "settings": {
+    "title": "Paràmetres Globals",
+    "noSettings": "No hi ha paràmetres globals per aquest model.",
+    "on": "Activat",
+    "off": "Desactivat",
+    "squelch": "Nivell de Squelch",
+    "backlight": "Temps Pantalla (s)",
+    "beep": "So de Tecles",
+    "voicePrompt": "Guia de Veu",
+    "step": "Salt (Step)",
+    "save": "Estalvi de Bateria",
+    "vox": "VOX",
+    "tdr": "Doble Escolta (TDR)",
+    "timeout": "Límit de Temps (TOT)",
+    "bcl": "Cierre de Canal Ocupat (BCL)",
+    "autolk": "Bloqueig de Teclat Automàtic",
+    "sftd": "Dir. de Desplaçament",
+    "wtled": "Color LED en Espera",
+    "rxled": "Color LED en Recepció",
+    "txled": "Color LED en Transmissió",
+    "almod": "Mode d'Alarma",
+    "band": "Banda Predeterminada",
+    "tdrab": "TX en Doble Escolta",
+    "ste": "Supressió Cua (STE)",
+    "rpste": "Supressió Cua Repetidor (RP-STE)",
+    "rptrl": "Retard Supressió Cua (RPT-RL)",
+    "ponmsg": "Missatge d'Inici",
+    "roger": "Roger Beep",
+    "workmode": "Mode de Treball (Display)"
+  },
+  "language": {
+    "select": "Idioma",
+    "en": "English",
+    "es": "Español",
+    "ca": "Català"
+  },
+  "auth": {
+    "login": "Iniciar sessió",
+    "register": "Registrar-se",
+    "logout": "Tancar sessió",
+    "email": "Correu electrònic",
+    "password": "Contrasenya",
+    "callsign": "Indicatiu (opcional)",
+    "loginTitle": "Benvingut de nou",
+    "registerTitle": "Crear compte",
+    "checkEmail": "Comprova el teu correu",
+    "loginButton": "Entrar",
+    "registerButton": "Crear compte",
+    "close": "Tancar",
+    "errors": {
+      "invalidCredentials": "Correu o contrasenya incorrectes.",
+      "emailTaken": "Aquest correu ja està registrat.",
+      "generic": "Quelcom ha fallat. Torna-ho a intentar."
+    },
+    "success": {
+      "registered": "Compte creat! Comprova el teu correu per confirmar-lo abans d'iniciar sessió.",
+      "loggedIn": "Benvingut, {{name}}!",
+      "loggedOut": "Sessió tancada."
+    }
+  },
+  "profile": {
+    "title": "El meu perfil",
+    "callsign": "Indicatiu",
+    "callsignHint": "El teu indicatiu de radioaficionat, que es mostrarà als teus codefiles.",
+    "country": "País",
+    "save": "Desar canvis",
+    "saved": "Desat!",
+    "errors": {
+      "saveFailed": "No s'ha pogut desar el perfil. Torna-ho a intentar."
+    }
+  },
+  "repository": {
+    "tab": "Repositori",
+    "title": "Repositori de Codefiles",
+    "subtitle": "Cerca, comparteix i descarrega configuracions de ràdio de la comunitat.",
+    "loginToUpload": "Inicia sessió per pujar",
+    "createAccount": "Crea un compte gratuït",
+    "searchPlaceholder": "Cerca per ràdio, zona, indicatiu...",
+    "search": "Cercar",
+    "filterButton": "Filtres",
+    "results": "{{count}} resultats",
+    "empty": "No s'han trobat codefiles. Sigues el primer en pujar-ne un!",
+    "page": "Pàgina {{current}} de {{total}}",
+    "upload": {
+      "button": "Pujar codefile",
+      "title": "Pujar codefile",
+      "titleField": "Títol",
+      "titlePlaceholder": "Ex: Catalunya - Repetidors VHF/UHF",
+      "description": "Descripció",
+      "descriptionPlaceholder": "Breu descripció del contingut (opcional)",
+      "brand": "Marca",
+      "selectBrand": "Selecciona marca",
+      "model": "Model",
+      "selectModel": "Selecciona model",
+      "country": "País",
+      "countryPlaceholder": "Ex: Espanya",
+      "region": "Regió",
+      "regionPlaceholder": "Ex: Catalunya (opcional)",
+      "file": "Fitxer",
+      "filePlaceholder": "Selecciona un fitxer .img o .csv",
+      "invalidFormat": "Només s'accepten fitxers .img o .csv",
+      "autoDetected": "Ràdio detectada automàticament: {{brand}} {{model}}",
+      "submit": "Pujar",
+      "uploading": "Pujant..."
+    },
+    "filter": {
+      "allBrands": "Totes les marques",
+      "allModels": "Tots els models",
+      "anyCountry": "Qualsevol país",
+      "sortBy": "Ordenar per",
+      "newest": "Més recents",
+      "mostDownloaded": "Més descarregats",
+      "bestRated": "Millor valorats",
+      "clear": "Netejar filtres"
+    },
+    "card": {
+      "unknownAuthor": "Anònim",
+      "downloads": "descàrregues",
+      "download": "Descarregar",
+      "downloading": "Descarregant...",
+      "loginToDownload": "Inicia sessió per descarregar",
+      "preview": "Previsualitzar",
+      "details": "Comentaris i valoració"
+    },
+    "preview": {
+      "loading": "Carregant canals...",
+      "channelCount": "{{count}} canals",
+      "loadToEditor": "Carregar a l'editor",
+      "unsupportedModel": "Preview no disponible per a {{model}}",
+      "fetchError": "Error en obtenir el fitxer",
+      "decodeError": "Error en decodificar el fitxer"
+    },
+    "detail": {
+      "rating": "Valoració",
+      "noRatings": "Encara no hi ha valoracions",
+      "yourRating": "La teva valoració",
+      "removeRating": "Treure",
+      "loginToRate": "Inicia sessió per valorar",
+      "reportCodefile": "Reportar",
+      "comments": "Comentaris",
+      "noComments": "Encara no hi ha comentaris. Sigues el primer!",
+      "commentPlaceholder": "Escriu un comentari... (Ctrl+Enter per enviar)",
+      "replyPlaceholder": "Escriu una resposta...",
+      "reply": "Respondre",
+      "delete": "Esborrar",
+      "report": "Reportar",
+      "reportReason": "Motiu del report (opcional)...",
+      "reportConfirm": "Enviar report",
+      "loginToComment": "Inicia sessió per comentar"
+    }
+  }
+}

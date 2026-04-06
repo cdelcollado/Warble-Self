@@ -1,0 +1,262 @@
+{
+  "app": {
+    "title": "Warble",
+    "subtitle": "Warble: programación de radios para la web",
+    "beta": "BETA 0.9",
+    "tabs": {
+      "memory": "Memoria",
+      "usb": "Conexión USB",
+      "settings": "Configuración"
+    },
+    "buttons": {
+      "openFile": "Abrir Archivo (.img, .csv, .ddmr)",
+      "saveImg": "Guardar Imagen (.img)"
+    },
+    "sections": {
+      "file": "Archivo"
+    },
+    "radioBar": {
+      "fileLoaded": "Archivo cargado",
+      "noFile": "Sin archivo cargado",
+      "unsaved": "Cambios pendientes"
+    },
+    "alerts": {
+      "importSuccess": "Se han importado correctamente {{count}} canales del archivo {{filename}}.",
+      "importError": "Error al abrir el archivo: {{error}}"
+    },
+    "driverMismatch": {
+      "title": "El archivo no corresponde a la radio seleccionada",
+      "message": "Este archivo es para {{detected}}, pero tienes seleccionado {{current}}. ¿Quieres cambiar de radio y continuar?",
+      "switchAndLoad": "Cambiar a {{model}} y cargar",
+      "cancel": "Cancelar"
+    }
+  },
+  "radio": {
+    "panelTitle": "Panel de Control Serie",
+    "panelSubtitle": "MVP Conexión & Protocolo",
+    "status": {
+      "idle": "Desconectado",
+      "connecting": "CONECTANDO",
+      "connected": "CONECTADO",
+      "reading": "LEYENDO",
+      "writing": "ESCRIBIENDO",
+      "error": "ERROR"
+    },
+    "buttons": {
+      "connect": "Conectar Cable USB",
+      "read": "Leer Datos (Read from Radio)",
+      "reading": "Leyendo bloque de memoria...",
+      "write": "Escribir Datos (Write to Radio)",
+      "writing": "Grabando EEPROM..."
+    },
+    "progress": {
+      "reading": "Progreso de Lectura",
+      "writing": "Progreso de Escritura"
+    },
+    "ready": {
+      "title": "Dispositivo listo para operar",
+      "description": "Asegúrate de tener la radio analógica encendida, con el volumen al 100% y conectada firmemente antes de empezar la clonación."
+    },
+    "errors": {
+      "noMemory": "No hay ningún mapa de memoria cargado previamente. Haz una lectura primero."
+    },
+    "logs": {
+      "writeSuccess": "¡Hexadecimal con los Canales insertados subido a EEPROM con éxito!"
+    }
+  },
+  "grid": {
+    "buttons": {
+      "paste": "Pegar desde Excel",
+      "write": "Escribir en Radio",
+      "export": "Guardar .CSV",
+      "clear": "Vaciar",
+      "add": "Añadir Canal",
+      "addPmr": "Añadir PMR",
+      "delete": "Eliminar",
+      "clearAll": "Vaciar Todo"
+    },
+    "alerts": {
+      "pasteSuccess": "Se han importado {{count}} canales del portapapeles correctamente.",
+      "pasteFallback": "Tu navegador bloquea el acceso directo al portapapeles. Usa Ctrl+V en lugar de presionar el botón.",
+      "invalidFrequency": "Frecuencia inválida. Debe ser un número válido entre 136-174 MHz (VHF) o 400-520 MHz (UHF).",
+      "outOfRange": "Frecuencia fuera del rango de esta radio",
+      "confirmClearAll": "¿Estás seguro de que quieres borrar absolutamente TODOS los canales de la tabla? Esta acción no se puede deshacer."
+    },
+    "zones": {
+      "title": "Grupos de Canales:",
+      "all": "Todos los Canales",
+      "z1": "Zona A (1-32)",
+      "z2": "Zona B (33-64)",
+      "z3": "Zona C (65-96)",
+      "z4": "Zona D (97-128)"
+    },
+    "columns": {
+      "loc": "Canal",
+      "frequency": "Frecuencia",
+      "name": "Nombre",
+      "toneMode": "Modo Tono",
+      "tone": "Tono",
+      "toneSql": "TonoSql",
+      "dtcsCode": "Código DTCS",
+      "rxDtcsCode": "Código RX DTCS",
+      "dtcsPol": "Pol DTCS",
+      "duplex": "Dúplex",
+      "offset": "Desplazamiento",
+      "mode": "Modo",
+      "power": "Potencia",
+      "skip": "Saltar",
+      "timeslot": "Timeslot",
+      "talkgroup": "TalkGroup"
+    }
+  },
+  "settings": {
+    "title": "Ajustes Globales",
+    "noSettings": "No hay ajustes globales para este modelo.",
+    "on": "Act.",
+    "off": "Desc.",
+    "squelch": "Nivel Squelch",
+    "backlight": "Retroiluminación (s)",
+    "beep": "Sonido Teclas",
+    "voicePrompt": "Guía de Voz",
+    "step": "Salto (Step)",
+    "save": "Ahorro de Batería",
+    "vox": "VOX",
+    "tdr": "Doble Escucha (TDR)",
+    "timeout": "Límite de Tiempo (TOT)",
+    "bcl": "Cierre de Canal Ocupado (BCL)",
+    "autolk": "Bloqueo Automático (Autolk)",
+    "sftd": "Dir. de Desplazamiento",
+    "wtled": "Color LED en Espera",
+    "rxled": "Color LED en Recepción",
+    "txled": "Color LED en Transmisión",
+    "almod": "Modo de Alarma",
+    "band": "Banda Predeterminada",
+    "tdrab": "TX en Doble Escucha",
+    "ste": "Supresión Cola (STE)",
+    "rpste": "Supresión Cola Repetidor (RP-STE)",
+    "rptrl": "Retardo Supresión Cola (RPT-RL)",
+    "ponmsg": "Mensaje de Inicio",
+    "roger": "Roger Beep",
+    "workmode": "Modo de Trabajo (Display)"
+  },
+  "language": {
+    "select": "Idioma",
+    "en": "English",
+    "es": "Español",
+    "ca": "Català"
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "callsign": "Indicativo (opcional)",
+    "loginTitle": "Bienvenido de nuevo",
+    "registerTitle": "Crear cuenta",
+    "checkEmail": "Revisa tu correo",
+    "loginButton": "Entrar",
+    "registerButton": "Crear cuenta",
+    "close": "Cerrar",
+    "errors": {
+      "invalidCredentials": "Correo o contraseña incorrectos.",
+      "emailTaken": "Este correo ya está registrado.",
+      "generic": "Algo salió mal. Inténtalo de nuevo."
+    },
+    "success": {
+      "registered": "¡Cuenta creada! Revisa tu bandeja de entrada para confirmar el correo antes de iniciar sesión.",
+      "loggedIn": "¡Bienvenido, {{name}}!",
+      "loggedOut": "Sesión cerrada."
+    }
+  },
+  "profile": {
+    "title": "Mi perfil",
+    "callsign": "Indicativo",
+    "callsignHint": "Tu indicativo de radioaficionado, que aparecerá junto a tus codefiles.",
+    "country": "País",
+    "save": "Guardar cambios",
+    "saved": "¡Guardado!",
+    "errors": {
+      "saveFailed": "No se pudo guardar el perfil. Inténtalo de nuevo."
+    }
+  },
+  "repository": {
+    "tab": "Repositorio",
+    "title": "Repositorio de Codefiles",
+    "subtitle": "Busca, comparte y descarga configuraciones de radio de la comunidad.",
+    "loginToUpload": "Inicia sesión para subir",
+    "createAccount": "Crear cuenta gratuita",
+    "searchPlaceholder": "Buscar por radio, región, indicativo...",
+    "search": "Buscar",
+    "filterButton": "Filtros",
+    "results": "{{count}} resultados",
+    "empty": "No se han encontrado codefiles. ¡Sé el primero en subir uno!",
+    "page": "Página {{current}} de {{total}}",
+    "upload": {
+      "button": "Subir codefile",
+      "title": "Subir codefile",
+      "titleField": "Título",
+      "titlePlaceholder": "Ej: Cataluña - Repetidores VHF/UHF",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Breve descripción del contenido (opcional)",
+      "brand": "Marca",
+      "selectBrand": "Selecciona marca",
+      "model": "Modelo",
+      "selectModel": "Selecciona modelo",
+      "country": "País",
+      "countryPlaceholder": "Ej: España",
+      "region": "Región",
+      "regionPlaceholder": "Ej: Cataluña (opcional)",
+      "file": "Archivo",
+      "filePlaceholder": "Selecciona un archivo .img o .csv",
+      "invalidFormat": "Solo se aceptan archivos .img o .csv",
+      "autoDetected": "Radio detectada automáticamente: {{brand}} {{model}}",
+      "submit": "Subir",
+      "uploading": "Subiendo..."
+    },
+    "filter": {
+      "allBrands": "Todas las marcas",
+      "allModels": "Todos los modelos",
+      "anyCountry": "Cualquier país",
+      "sortBy": "Ordenar por",
+      "newest": "Más recientes",
+      "mostDownloaded": "Más descargados",
+      "bestRated": "Mejor valorados",
+      "clear": "Limpiar filtros"
+    },
+    "card": {
+      "unknownAuthor": "Anónimo",
+      "downloads": "descargas",
+      "download": "Descargar",
+      "downloading": "Descargando...",
+      "loginToDownload": "Inicia sesión para descargar",
+      "preview": "Previsualizar"
+    },
+    "preview": {
+      "loading": "Cargando canales...",
+      "channelCount": "{{count}} canales",
+      "loadToEditor": "Cargar en el editor",
+      "unsupportedModel": "Preview no disponible para {{model}}",
+      "fetchError": "Error al obtener el archivo",
+      "decodeError": "Error al decodificar el archivo"
+    },
+    "detail": {
+      "rating": "Valoración",
+      "noRatings": "Aún no hay valoraciones",
+      "yourRating": "Tu valoración",
+      "removeRating": "Quitar",
+      "loginToRate": "Inicia sesión para valorar",
+      "reportCodefile": "Reportar",
+      "comments": "Comentarios",
+      "noComments": "Aún no hay comentarios. ¡Sé el primero!",
+      "commentPlaceholder": "Escribe un comentario... (Ctrl+Enter para enviar)",
+      "replyPlaceholder": "Escribe una respuesta...",
+      "reply": "Responder",
+      "delete": "Eliminar",
+      "report": "Reportar",
+      "reportReason": "Motivo del reporte (opcional)...",
+      "reportConfirm": "Enviar reporte",
+      "loginToComment": "Inicia sesión para comentar"
+    }
+  }
+}
