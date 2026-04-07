@@ -14,7 +14,6 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.101.1",
     "ag-grid-community": "^35.1.0",
     "ag-grid-react": "^35.1.0",
     "clsx": "^2.1.1",

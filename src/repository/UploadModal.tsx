@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { Upload, X, FileUp, Sparkles } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { RADIO_BRANDS } from '../lib/supabase'
+import { RADIO_BRANDS } from '../lib/catalog'
 import { uploadCodefile } from './useRepository'
 import type { AuthUser } from '../auth/useAuth'
 import { detectRadioFromImg } from '../lib/imgDetection'

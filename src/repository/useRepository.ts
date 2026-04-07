@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { api, apiBuffer } from '../lib/api'
-import type { CodefileWithAuthor, Comment, Rating } from '../lib/supabase'
+import type { CodefileWithAuthor, Comment, Rating } from '../lib/catalog'
 
 export interface RepositoryFilters {
   search: string

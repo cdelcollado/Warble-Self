@@ -1,4 +1,4 @@
-import { RADIO_BRANDS } from './supabase'
+import { RADIO_BRANDS } from './catalog'
 
 // .img footer magic bytes: \x00\xff + "chirp" + \xee + "img" + \x00
 const IMG_MAGIC = new Uint8Array([0x00, 0xFF, 0x63, 0x68, 0x69, 0x72, 0x70, 0xEE, 0x69, 0x6D, 0x67, 0x00])

@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { X, Star, MessageSquare, Flag, Trash2, CornerDownRight, Send, Download, MapPin, Radio, User } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { AuthUser } from '../auth/useAuth'
-import type { CodefileWithAuthor, Comment, Rating } from '../lib/supabase'
+import type { CodefileWithAuthor, Comment, Rating } from '../lib/catalog'
 import {
   fetchRatings, upsertRating, deleteRating,
   fetchComments, addComment, deleteComment, reportContent,
