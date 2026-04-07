@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { X, Star, MessageSquare, Flag, Trash2, CornerDownRight, Send, Download, MapPin, Radio, User } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import type { User as SupabaseUser } from '@supabase/supabase-js'
+import type { AuthUser } from '../auth/useAuth'
 import type { CodefileWithAuthor, Comment, Rating } from '../lib/supabase'
 import {
   fetchRatings, upsertRating, deleteRating,
@@ -97,7 +97,7 @@ function CommentItem({
 }: {
   comment: Comment
   replies: Comment[]
-  user: SupabaseUser | null
+  user: AuthUser | null
   locale: string
   onReply: (parentId: string, body: string) => Promise<void>
   onDelete: (id: string) => void
@@ -129,7 +129,7 @@ function CommentItem({
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2 flex-wrap">
             <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">{author}</span>
-            <span className="text-[10px] text-slate-400 dark:text-slate-500">{relativeTime(comment.created_at, locale)}</span>
+            <span className="text-[10px] text-slate-400 dark:text-slate-500">{relativeTime(comment.createdAt, locale)}</span>
           </div>
           <p className="text-sm text-slate-700 dark:text-slate-300 mt-0.5 leading-relaxed whitespace-pre-wrap break-words">{comment.body}</p>
           <div className="flex items-center gap-3 mt-1">
@@ -139,13 +139,13 @@ function CommentItem({
                 {t('repository.detail.reply')}
               </button>
             )}
-            {user && user.id !== comment.author_id && (
+            {user && user.id !== comment.authorId && (
               <button onClick={() => setShowReport(v => !v)} className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
                 <Flag className="w-3 h-3" />
                 {t('repository.detail.report')}
               </button>
             )}
-            {user && user.id === comment.author_id && (
+            {user && user.id === comment.authorId && (
               <button onClick={() => onDelete(comment.id)} className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
                 <Trash2 className="w-3 h-3" />
                 {t('repository.detail.delete')}
@@ -195,17 +195,17 @@ function CommentItem({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline gap-2 flex-wrap">
                     <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">{rAuthor}</span>
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500">{relativeTime(reply.created_at, locale)}</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500">{relativeTime(reply.createdAt, locale)}</span>
                   </div>
                   <p className="text-sm text-slate-700 dark:text-slate-300 mt-0.5 leading-relaxed whitespace-pre-wrap break-words">{reply.body}</p>
                   <div className="flex items-center gap-3 mt-1">
-                    {user && user.id !== reply.author_id && (
+                    {user && user.id !== reply.authorId && (
                       <button onClick={() => onReport(reply.id, '')} className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
                         <Flag className="w-3 h-3" />
                         {t('repository.detail.report')}
                       </button>
                     )}
-                    {user && user.id === reply.author_id && (
+                    {user && user.id === reply.authorId && (
                       <button onClick={() => onDelete(reply.id)} className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
                         <Trash2 className="w-3 h-3" />
                         {t('repository.detail.delete')}
@@ -226,7 +226,7 @@ function CommentItem({
 
 interface CodefileDetailModalProps {
   codefile: CodefileWithAuthor
-  user: SupabaseUser | null
+  user: AuthUser | null
   onClose: () => void
   onOpenAuth: () => void
 }
@@ -243,7 +243,7 @@ export function CodefileDetailModal({ codefile, user, onClose, onOpenAuth }: Cod
   const commentInputRef = useRef<HTMLTextAreaElement>(null)
 
   const avg = avgRating(ratings)
-  const userRating = ratings.find(r => r.user_id === user?.id)?.rating ?? 0
+  const userRating = ratings.find(r => r.userId === user?.id)?.rating ?? 0
   const author = codefile.profiles?.callsign ?? t('repository.card.unknownAuthor')
   const location = [codefile.region, codefile.country].filter(Boolean).join(', ')
 
@@ -258,12 +258,12 @@ export function CodefileDetailModal({ codefile, user, onClose, onOpenAuth }: Cod
     if (!user) { onOpenAuth(); return }
     if (value === 0) {
       await deleteRating(codefile.id, user.id)
-      setRatings(prev => prev.filter(r => r.user_id !== user.id))
+      setRatings(prev => prev.filter(r => r.userId !== user.id))
     } else {
       await upsertRating(codefile.id, user.id, value)
       setRatings(prev => {
-        const without = prev.filter(r => r.user_id !== user.id)
-        return [...without, { id: '', codefile_id: codefile.id, user_id: user.id, rating: value, created_at: new Date().toISOString() }]
+        const without = prev.filter(r => r.userId !== user.id)
+        return [...without, { id: '', codefileId: codefile.id, userId: user.id, rating: value, createdAt: new Date().toISOString() }]
       })
     }
   }
@@ -290,7 +290,7 @@ export function CodefileDetailModal({ codefile, user, onClose, onOpenAuth }: Cod
   // Esborrar
   const handleDelete = async (id: string) => {
     await deleteComment(id)
-    setComments(prev => prev.filter(c => c.id !== id && c.parent_id !== id))
+    setComments(prev => prev.filter(c => c.id !== id && c.parentId !== id))
   }
 
   // Report comment
@@ -307,11 +307,11 @@ export function CodefileDetailModal({ codefile, user, onClose, onOpenAuth }: Cod
   }
 
   // Organise comments into a tree (root + replies)
-  const rootComments = comments.filter(c => !c.parent_id)
+  const rootComments = comments.filter(c => !c.parentId)
   const repliesMap: Record<string, Comment[]> = {}
-  comments.filter(c => c.parent_id).forEach(c => {
-    if (!repliesMap[c.parent_id!]) repliesMap[c.parent_id!] = []
-    repliesMap[c.parent_id!].push(c)
+  comments.filter(c => c.parentId).forEach(c => {
+    if (!repliesMap[c.parentId!]) repliesMap[c.parentId!] = []
+    repliesMap[c.parentId!].push(c)
   })
 
   return (
@@ -326,11 +326,11 @@ export function CodefileDetailModal({ codefile, user, onClose, onOpenAuth }: Cod
                 {codefile.title}
               </h2>
               <span className={`px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide ${
-                codefile.file_format === 'img'
+                codefile.fileFormat === 'img'
                   ? 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300'
                   : 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300'
               }`}>
-                .{codefile.file_format}
+                .{codefile.fileFormat}
               </span>
             </div>
             <div className="flex items-center gap-3 mt-1 text-xs text-slate-400 dark:text-slate-500 flex-wrap">

@@ -1,33 +1,28 @@
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Types matching the self-hosted backend (camelCase)
 
 export type Profile = {
   id: string
   callsign: string | null
   country: string | null
-  created_at: string
+  createdAt: string
 }
 
 export type Codefile = {
   id: string
-  author_id: string
+  authorId: string
   title: string
   description: string | null
   brand: string
   model: string
   country: string
   region: string | null
-  file_path: string
-  file_format: 'img' | 'csv' | 'ddmr'
+  filePath: string
+  fileFormat: 'img' | 'csv' | 'ddmr'
   downloads: number
-  avg_rating: number
-  rating_count: number
-  created_at: string
-  updated_at: string
+  avgRating: number
+  ratingCount: number
+  createdAt: string
+  updatedAt: string
 }
 
 export type CodefileWithAuthor = Codefile & {
@@ -36,20 +31,20 @@ export type CodefileWithAuthor = Codefile & {
 
 export type Comment = {
   id: string
-  codefile_id: string
-  author_id: string
-  parent_id: string | null
+  codefileId: string
+  authorId: string
+  parentId: string | null
   body: string
-  created_at: string
+  createdAt: string
   profiles: { callsign: string | null } | null
 }
 
 export type Rating = {
   id: string
-  codefile_id: string
-  user_id: string
+  codefileId: string
+  userId: string
   rating: number
-  created_at: string
+  createdAt: string
 }
 
 export const RADIO_BRANDS: Record<string, string[]> = {

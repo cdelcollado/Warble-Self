@@ -19,12 +19,15 @@ export const auth = betterAuth({
   trustedOrigins: [process.env.FRONTEND_URL!],
   emailAndPassword: {
     enabled: true,
+    sendResetPassword: async ({ user, url }) => {
+      // Log the reset URL to console for dev environments without email
+      console.log(`[Password Reset] User: ${user.email} — Reset URL: ${url}`)
+    },
   },
   databaseHooks: {
     user: {
       create: {
         after: async (user) => {
-          // Auto-create profile row when a user registers
           await db.insert(profiles).values({
             id: user.id,
             callsign: null,

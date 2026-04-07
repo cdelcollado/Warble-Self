@@ -8,6 +8,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Self-hosted backend** (2026-04-07)
+  - Replaced Supabase with a fully self-hosted stack: Fastify + Better Auth + Drizzle ORM + PostgreSQL + MinIO
+  - `backend/` — Fastify v5 REST API with Better Auth for email/password auth and session management
+  - `backend/src/routes/` — REST endpoints for profiles, codefiles, ratings, comments, reports
+  - `backend/src/storage/minio.ts` — MinIO S3-compatible file storage replacing Supabase Storage
+  - `src/lib/api.ts` — new central HTTP client (`api`, `authApi`, `apiBuffer`)
+  - All frontend data access migrated from Supabase SDK to custom REST API calls
+  - Password recovery flow: email link → token → new password form
+  - Auth modal extended with forgot/reset password modes (3 locales)
+
+- **Full Docker deployment** (2026-04-07)
+  - Root `Dockerfile` — multi-stage frontend build (Node 24 + nginx)
+  - `nginx.conf` — serves static frontend + proxies `/api/` to backend
+  - `docker-compose.yml` — single `docker compose up --build -d` starts postgres, minio, backend, frontend
+  - Backend Dockerfile fixed with proper multi-stage build (builder + runner stages)
+  - Automatic DB migrations on backend startup
+
 - **UI Design System** (2026-04-03)
   - `src/components/ui/Button.tsx` — unified `Button` component with variants (primary / secondary / outline / ghost / destructive) and sizes (sm / md / lg)
   - Migrated all raw `<button>` elements across the app to the `Button` component: `RadioProgrammer`, `AuthModal`, `ProfileModal`, `CodefileCard`, `RepositoryPage`, `UploadModal`

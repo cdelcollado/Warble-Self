@@ -1,6 +1,6 @@
 import { Table, Settings2, Database, FolderOpen, Save, Moon, Sun, Globe, LogIn, LogOut, User, Radio, UploadCloud, FileDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import type { User as SupabaseUser } from '@supabase/supabase-js'
+import type { AuthUser } from '../auth/useAuth'
 import { SUPPORTED_RADIOS } from '../lib/drivers'
 
 type Tab = 'memory' | 'settings' | 'repository'
@@ -8,7 +8,7 @@ type Tab = 'memory' | 'settings' | 'repository'
 interface SidebarProps {
   activeTab: Tab
   onTabChange: (tab: Tab) => void
-  user: SupabaseUser | null
+  user: AuthUser | null
   displayName: string | null
   onOpenAuth: () => void
   onOpenProfile: () => void

@@ -85,7 +85,7 @@ export function PreviewModal({ codefile, isDarkMode, onClose, onLoadToEditor }: 
         return
       }
 
-      const { buffer, error: fetchError } = await fetchCodefileBuffer(codefile.file_path)
+      const { buffer, error: fetchError } = await fetchCodefileBuffer(codefile.filePath, codefile.id)
       if (cancelled) return
 
       if (fetchError || !buffer) {

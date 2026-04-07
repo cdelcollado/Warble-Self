@@ -1,54 +1,75 @@
 import { useState, useEffect } from 'react'
-import type { User } from '@supabase/supabase-js'
-import { supabase } from '../lib/supabase'
+import { authApi, api } from '../lib/api'
+
+export interface AuthUser {
+  id: string
+  email: string
+  name: string
+}
+
+interface BetterAuthResponse {
+  user: AuthUser
+  token?: string
+  session?: { id: string }
+}
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<AuthUser | null>(null)
+  const [callsign, setCallsign] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-    })
-
-    return () => subscription.unsubscribe()
+    authApi<BetterAuthResponse>('/get-session')
+      .then(async ({ data }) => {
+        const sessionUser = data?.user ?? null
+        setUser(sessionUser)
+        if (sessionUser) {
+          const { data: profile } = await api<{ callsign: string | null }>('/profiles/me')
+          setCallsign(profile?.callsign ?? null)
+        }
+      })
+      .finally(() => setLoading(false))
   }, [])
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await authApi<BetterAuthResponse>('/sign-in/email', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    })
+    if (data?.user) {
+      setUser(data.user)
+      const { data: profile } = await api<{ callsign: string | null }>('/profiles/me')
+      setCallsign(profile?.callsign ?? null)
+    }
     return { error }
   }
 
-  const signUp = async (email: string, password: string, callsign?: string) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { callsign: callsign?.toUpperCase() || null } },
+  const signUp = async (email: string, password: string, callsignInput?: string) => {
+    const name = callsignInput?.toUpperCase() || email
+    const { data, error } = await authApi<BetterAuthResponse>('/sign-up/email', {
+      method: 'POST',
+      body: JSON.stringify({ email, password, name }),
     })
-
-    if (data.user && !error) {
-      await supabase.from('profiles').insert({
-        id: data.user.id,
-        callsign: callsign?.toUpperCase() || null,
-        country: null,
-      })
+    if (data?.user) {
+      setUser(data.user)
+      if (callsignInput) {
+        await api('/profiles/me', {
+          method: 'PUT',
+          body: JSON.stringify({ callsign: callsignInput.toUpperCase() }),
+        })
+        setCallsign(callsignInput.toUpperCase())
+      }
     }
-
-    return { data, error }
+    return { error }
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
+    await authApi('/sign-out', { method: 'POST' })
+    setUser(null)
+    setCallsign(null)
   }
 
-  const displayName = user
-    ? (user.user_metadata?.callsign as string | null) ?? user.email?.split('@')[0] ?? 'User'
-    : null
+  const displayName = callsign ?? user?.email?.split('@')[0] ?? null
 
   return { user, loading, displayName, signIn, signUp, signOut }
 }

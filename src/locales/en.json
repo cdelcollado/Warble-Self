@@ -157,16 +157,28 @@
     "checkEmail": "Check your email",
     "loginButton": "Sign in",
     "registerButton": "Create account",
+    "forgotTitle": "Reset password",
+    "forgotPassword": "Forgot password?",
+    "sendResetLink": "Send reset link",
+    "resetSent": "Email sent",
+    "resetEmailSent": "If that address is registered, you'll receive a password reset link shortly.",
+    "backToLogin": "Back to login",
+    "resetPasswordTitle": "Set new password",
+    "newPassword": "New password",
+    "setNewPassword": "Set new password",
+    "passwordChanged": "Password changed",
     "close": "Close",
     "errors": {
       "invalidCredentials": "Incorrect email or password.",
       "emailTaken": "This email is already registered.",
+      "passwordTooShort": "Password must be at least 8 characters.",
       "generic": "Something went wrong. Please try again."
     },
     "success": {
       "registered": "Account created! Check your inbox to confirm your email before logging in.",
       "loggedIn": "Welcome, {{name}}!",
-      "loggedOut": "Logged out."
+      "loggedOut": "Logged out.",
+      "passwordChanged": "Your password has been updated. You can now sign in with your new password."
     }
   },
   "profile": {

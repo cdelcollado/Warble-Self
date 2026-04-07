@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { Database, Search, Upload, Filter, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import type { User } from '@supabase/supabase-js'
+import type { AuthUser } from '../auth/useAuth'
 import { RADIO_BRANDS } from '../lib/supabase'
 import { useRepository, type RepositoryFilters } from './useRepository'
 import { CodefileCard } from './CodefileCard'
@@ -10,7 +10,7 @@ import type { MemoryChannel } from '../lib/types'
 import { Button } from '../components/ui/Button'
 
 interface RepositoryPageProps {
-  user: User | null
+  user: AuthUser | null
   isDarkMode: boolean
   onOpenAuth: () => void
   onLoadToEditor: (channels: MemoryChannel[], model: string) => void

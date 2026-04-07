@@ -157,16 +157,28 @@
     "checkEmail": "Revisa tu correo",
     "loginButton": "Entrar",
     "registerButton": "Crear cuenta",
+    "forgotTitle": "Recuperar contraseña",
+    "forgotPassword": "¿Olvidaste la contraseña?",
+    "sendResetLink": "Enviar enlace de recuperación",
+    "resetSent": "Correo enviado",
+    "resetEmailSent": "Si esa dirección está registrada, recibirás un enlace para restablecer tu contraseña en breve.",
+    "backToLogin": "Volver al inicio de sesión",
+    "resetPasswordTitle": "Nueva contraseña",
+    "newPassword": "Nueva contraseña",
+    "setNewPassword": "Establecer nueva contraseña",
+    "passwordChanged": "Contraseña cambiada",
     "close": "Cerrar",
     "errors": {
       "invalidCredentials": "Correo o contraseña incorrectos.",
       "emailTaken": "Este correo ya está registrado.",
+      "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
       "generic": "Algo salió mal. Inténtalo de nuevo."
     },
     "success": {
       "registered": "¡Cuenta creada! Revisa tu bandeja de entrada para confirmar el correo antes de iniciar sesión.",
       "loggedIn": "¡Bienvenido, {{name}}!",
-      "loggedOut": "Sesión cerrada."
+      "loggedOut": "Sesión cerrada.",
+      "passwordChanged": "Tu contraseña ha sido actualizada. Ya puedes iniciar sesión con tu nueva contraseña."
     }
   },
   "profile": {

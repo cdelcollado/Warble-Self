@@ -3,17 +3,17 @@ import { Upload, X, FileUp, Sparkles } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { RADIO_BRANDS } from '../lib/supabase'
 import { uploadCodefile } from './useRepository'
-import type { User } from '@supabase/supabase-js'
+import type { AuthUser } from '../auth/useAuth'
 import { detectRadioFromImg } from '../lib/imgDetection'
 import { Button } from '../components/ui/Button'
 
 interface UploadModalProps {
-  user: User
+  user: AuthUser
   onClose: () => void
   onSuccess: () => void
 }
 
-export function UploadModal({ user, onClose, onSuccess }: UploadModalProps) {
+export function UploadModal({ onClose, onSuccess }: UploadModalProps) {
   const { t } = useTranslation()
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -63,7 +63,6 @@ export function UploadModal({ user, onClose, onSuccess }: UploadModalProps) {
     setError(null)
 
     const { error: err } = await uploadCodefile(
-      user.id,
       { title, description, brand, model, country, region },
       file
     )

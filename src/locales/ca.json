@@ -157,16 +157,28 @@
     "checkEmail": "Comprova el teu correu",
     "loginButton": "Entrar",
     "registerButton": "Crear compte",
+    "forgotTitle": "Recuperar contrasenya",
+    "forgotPassword": "Has oblidat la contrasenya?",
+    "sendResetLink": "Envia l'enllaç de recuperació",
+    "resetSent": "Correu enviat",
+    "resetEmailSent": "Si aquesta adreça està registrada, rebràs un enllaç per restablir la contrasenya en breu.",
+    "backToLogin": "Torna a l'inici de sessió",
+    "resetPasswordTitle": "Nova contrasenya",
+    "newPassword": "Nova contrasenya",
+    "setNewPassword": "Establir nova contrasenya",
+    "passwordChanged": "Contrasenya canviada",
     "close": "Tancar",
     "errors": {
       "invalidCredentials": "Correu o contrasenya incorrectes.",
       "emailTaken": "Aquest correu ja està registrat.",
+      "passwordTooShort": "La contrasenya ha de tenir almenys 8 caràcters.",
       "generic": "Quelcom ha fallat. Torna-ho a intentar."
     },
     "success": {
       "registered": "Compte creat! Comprova el teu correu per confirmar-lo abans d'iniciar sessió.",
       "loggedIn": "Benvingut, {{name}}!",
-      "loggedOut": "Sessió tancada."
+      "loggedOut": "Sessió tancada.",
+      "passwordChanged": "La teva contrasenya s'ha actualitzat. Ja pots iniciar sessió amb la nova contrasenya."
     }
   },
   "profile": {

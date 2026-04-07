@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { X, Radio, Globe2, Loader2, Check, AlertCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { supabase } from '../lib/supabase'
-import type { User } from '@supabase/supabase-js'
+import { api } from '../lib/api'
+import type { AuthUser } from './useAuth'
 import { Button } from '../components/ui/Button'
 
 const COUNTRIES = [
@@ -30,7 +30,7 @@ const COUNTRIES = [
 ]
 
 interface ProfileModalProps {
-  user: User
+  user: AuthUser
   onClose: () => void
 }
 
@@ -46,11 +46,7 @@ export function ProfileModal({ user, onClose }: ProfileModalProps) {
 
   // Load existing profile
   useEffect(() => {
-    supabase
-      .from('profiles')
-      .select('callsign, country')
-      .eq('id', user.id)
-      .single()
+    api<{ callsign: string | null; country: string | null }>('/profiles/me')
       .then(({ data }) => {
         if (data) {
           setCallsign(data.callsign ?? '')
@@ -74,13 +70,13 @@ export function ProfileModal({ user, onClose }: ProfileModalProps) {
     setError(null)
     setSaved(false)
 
-    const { error: err } = await supabase
-      .from('profiles')
-      .upsert({
-        id: user.id,
+    const { error: err } = await api('/profiles/me', {
+      method: 'PUT',
+      body: JSON.stringify({
         callsign: callsign.toUpperCase() || null,
         country: country || null,
-      })
+      }),
+    })
 
     setSaving(false)
     if (err) {

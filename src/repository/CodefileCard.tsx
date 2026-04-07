@@ -1,7 +1,7 @@
 import { Download, MapPin, Radio, User, LogIn, Eye, MessageSquare, Star } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
-import type { User as SupabaseUser } from '@supabase/supabase-js'
+import type { AuthUser } from '../auth/useAuth'
 import type { CodefileWithAuthor } from '../lib/supabase'
 import type { MemoryChannel } from '../lib/types'
 import { downloadCodefile } from './useRepository'
@@ -14,7 +14,7 @@ const PREVIEWABLE_MODELS = new Set(['UV-5R', 'UV-5R MINI'])
 
 interface CodefileCardProps {
   codefile: CodefileWithAuthor
-  user: SupabaseUser | null
+  user: AuthUser | null
   isDarkMode: boolean
   onOpenAuth: () => void
   onDownloaded: () => void
@@ -27,14 +27,14 @@ export function CodefileCard({ codefile, user, isDarkMode, onOpenAuth, onDownloa
   const [showPreview, setShowPreview] = useState(false)
   const [showDetail, setShowDetail] = useState(false)
 
-  const canPreview = codefile.file_format === 'img' && PREVIEWABLE_MODELS.has(codefile.model)
+  const canPreview = codefile.fileFormat === 'img' && PREVIEWABLE_MODELS.has(codefile.model)
 
   const handleDownload = async () => {
     setDownloading(true)
-    const fileName = `${codefile.brand}_${codefile.model}_${codefile.title}.${codefile.file_format}`
+    const fileName = `${codefile.brand}_${codefile.model}_${codefile.title}.${codefile.fileFormat}`
       .replace(/\s+/g, '_')
       .toLowerCase()
-    await downloadCodefile(codefile.id, codefile.file_path, fileName)
+    await downloadCodefile(codefile.id, codefile.filePath, fileName)
     setDownloading(false)
     onDownloaded()
   }
@@ -56,11 +56,11 @@ export function CodefileCard({ codefile, user, isDarkMode, onOpenAuth, onDownloa
           </div>
         </div>
         <span className={`shrink-0 px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide ${
-          codefile.file_format === 'img'
+          codefile.fileFormat === 'img'
             ? 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300'
             : 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300'
         }`}>
-          .{codefile.file_format}
+          .{codefile.fileFormat}
         </span>
       </div>
 
@@ -83,11 +83,11 @@ export function CodefileCard({ codefile, user, isDarkMode, onOpenAuth, onDownloa
             {location}
           </span>
         )}
-        {codefile.rating_count > 0 && (
+        {codefile.ratingCount > 0 && (
           <span className="flex items-center gap-1 shrink-0 ml-auto">
             <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-            <span className="font-medium text-slate-600 dark:text-slate-300">{Number(codefile.avg_rating).toFixed(1)}</span>
-            <span className="text-slate-400 dark:text-slate-500">({codefile.rating_count})</span>
+            <span className="font-medium text-slate-600 dark:text-slate-300">{Number(codefile.avgRating).toFixed(1)}</span>
+            <span className="text-slate-400 dark:text-slate-500">({codefile.ratingCount})</span>
           </span>
         )}
       </div>

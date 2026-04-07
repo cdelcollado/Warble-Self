@@ -49,8 +49,23 @@ app.addContentTypeParser('application/json', { parseAs: 'string' }, (req, body, 
 
 const authHandler = toNodeHandler(auth)
 
-app.all('/api/auth/*', async (req, reply) => {
-  await authHandler(req.raw, reply.raw)
+app.addHook('onRequest', async (req, reply) => {
+  if (req.url?.startsWith('/api/auth/')) {
+    const origin = process.env.FRONTEND_URL!
+    reply.raw.setHeader('Access-Control-Allow-Origin', origin)
+    reply.raw.setHeader('Access-Control-Allow-Credentials', 'true')
+    reply.raw.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+    reply.raw.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+
+    if (req.method === 'OPTIONS') {
+      reply.raw.writeHead(204)
+      reply.raw.end()
+      return
+    }
+
+    reply.hijack()
+    await authHandler(req.raw, reply.raw)
+  }
 })
 
 // ── Application routes ────────────────────────────────────────────────────────

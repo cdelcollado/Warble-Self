@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import { supabase, type CodefileWithAuthor, type Comment, type Rating } from '../lib/supabase'
+import { api, apiBuffer } from '../lib/api'
+import type { CodefileWithAuthor, Comment, Rating } from '../lib/supabase'
 
 export interface RepositoryFilters {
   search: string
@@ -9,7 +10,7 @@ export interface RepositoryFilters {
   sortBy: 'newest' | 'downloads' | 'rating'
 }
 
-const PAGE_SIZE = 20
+const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
 
 export function useRepository(filters: RepositoryFilters, page: number) {
   const [codefiles, setCodefiles] = useState<CodefileWithAuthor[]>([])
@@ -17,51 +18,39 @@ export function useRepository(filters: RepositoryFilters, page: number) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetch = useCallback(async () => {
+  const load = useCallback(async () => {
     setLoading(true)
     setError(null)
 
-    let query = supabase
-      .from('codefiles')
-      .select('*, profiles(callsign)', { count: 'exact' })
+    const params = new URLSearchParams()
+    if (filters.search.trim()) params.set('search', filters.search.trim())
+    if (filters.brand) params.set('brand', filters.brand)
+    if (filters.model) params.set('model', filters.model)
+    if (filters.country) params.set('country', filters.country)
+    params.set('sortBy', filters.sortBy)
+    params.set('page', String(page))
 
-    if (filters.search.trim()) {
-      query = query.or(
-        `title.ilike.%${filters.search}%,brand.ilike.%${filters.search}%,model.ilike.%${filters.search}%,country.ilike.%${filters.search}%`
-      )
-    }
-    if (filters.brand) query = query.eq('brand', filters.brand)
-    if (filters.model) query = query.eq('model', filters.model)
-    if (filters.country) query = query.ilike('country', filters.country)
-
-    if (filters.sortBy === 'downloads') {
-      query = query.order('downloads', { ascending: false })
-    } else if (filters.sortBy === 'rating') {
-      query = query.order('avg_rating', { ascending: false }).order('rating_count', { ascending: false })
-    } else {
-      query = query.order('created_at', { ascending: false })
-    }
-
-    query = query.range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1)
-
-    const { data, count, error: err } = await query
-
-    if (err) {
-      setError(err.message)
-    } else {
-      setCodefiles((data as CodefileWithAuthor[]) ?? [])
-      setTotal(count ?? 0)
+    try {
+      const res = await window.fetch(`${BASE}/api/codefiles?${params}`, { credentials: 'include' })
+      const json = await res.json()
+      if (json.success) {
+        setCodefiles(json.data ?? [])
+        setTotal(json.meta?.total ?? 0)
+      } else {
+        setError(json.error ?? 'Error')
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Network error')
     }
     setLoading(false)
   }, [filters, page])
 
-  useEffect(() => { fetch() }, [fetch])
+  useEffect(() => { load() }, [load])
 
-  return { codefiles, total, loading, error, refetch: fetch }
+  return { codefiles, total, loading, error, refetch: load }
 }
 
 export async function uploadCodefile(
-  authorId: string,
   fields: {
     title: string
     description: string
@@ -70,146 +59,109 @@ export async function uploadCodefile(
     country: string
     region: string
   },
-  file: File
+  file: File,
 ): Promise<{ error: string | null }> {
-  const ext = file.name.endsWith('.csv') ? 'csv' : 'img'
-  const filePath = `${authorId}/${Date.now()}_${file.name}`
+  const form = new FormData()
+  form.append('file', file)
+  form.append('title', fields.title.trim())
+  form.append('description', fields.description.trim())
+  form.append('brand', fields.brand)
+  form.append('model', fields.model)
+  form.append('country', fields.country.trim())
+  form.append('region', fields.region.trim())
 
-  const { error: storageError } = await supabase.storage
-    .from('codefiles')
-    .upload(filePath, file, { contentType: 'application/octet-stream' })
-
-  if (storageError) return { error: storageError.message }
-
-  const { error: dbError } = await supabase.from('codefiles').insert({
-    author_id: authorId,
-    title: fields.title.trim(),
-    description: fields.description.trim() || null,
-    brand: fields.brand,
-    model: fields.model,
-    country: fields.country.trim(),
-    region: fields.region.trim() || null,
-    file_path: filePath,
-    file_format: ext,
-    downloads: 0,
-  })
-
-  if (dbError) {
-    await supabase.storage.from('codefiles').remove([filePath])
-    return { error: dbError.message }
-  }
-
-  return { error: null }
+  const { error } = await api('/codefiles', { method: 'POST', body: form })
+  return { error }
 }
 
 export async function downloadCodefile(
   codefileId: string,
-  filePath: string,
-  fileName: string
+  _filePath: string,
+  fileName: string,
 ): Promise<{ error: string | null }> {
-  const { data, error: storageError } = await supabase.storage
-    .from('codefiles')
-    .download(filePath)
+  const { data, error } = await api<{ url: string; filename: string }>(
+    `/codefiles/${codefileId}/download`,
+    { method: 'POST' },
+  )
+  if (error || !data) return { error: error ?? 'Download failed' }
 
-  if (storageError) return { error: storageError.message }
-
-  const url = URL.createObjectURL(data)
   const a = document.createElement('a')
-  a.href = url
+  a.href = data.url
   a.download = fileName
   a.click()
-  URL.revokeObjectURL(url)
-
-  await supabase.rpc('increment_downloads', { codefile_id: codefileId })
 
   return { error: null }
 }
 
 export async function fetchCodefileBuffer(
-  filePath: string
+  _filePath: string,
+  codefileId: string,
 ): Promise<{ buffer: Uint8Array | null; error: string | null }> {
-  const { data, error: storageError } = await supabase.storage
-    .from('codefiles')
-    .download(filePath)
-
-  if (storageError) return { buffer: null, error: storageError.message }
-
-  const buffer = new Uint8Array(await data.arrayBuffer())
-  return { buffer, error: null }
+  return apiBuffer(`/codefiles/${codefileId}/buffer`)
 }
 
 // ── Ratings ──────────────────────────────────────────────────────────────────
 
 export async function fetchRatings(codefileId: string): Promise<Rating[]> {
-  const { data } = await supabase
-    .from('codefile_ratings')
-    .select('*')
-    .eq('codefile_id', codefileId)
-  return (data as Rating[]) ?? []
+  const { data } = await api<Rating[]>(`/codefiles/${codefileId}/ratings`)
+  return data ?? []
 }
 
 export async function upsertRating(
-  codefileId: string, userId: string, rating: number
+  codefileId: string,
+  _userId: string,
+  rating: number,
 ): Promise<{ error: string | null }> {
-  const { error } = await supabase
-    .from('codefile_ratings')
-    .upsert({ codefile_id: codefileId, user_id: userId, rating }, { onConflict: 'codefile_id,user_id' })
-  return { error: error?.message ?? null }
+  const { error } = await api(`/codefiles/${codefileId}/ratings`, {
+    method: 'PUT',
+    body: JSON.stringify({ rating }),
+  })
+  return { error }
 }
 
 export async function deleteRating(
-  codefileId: string, userId: string
+  codefileId: string,
+  _userId: string,
 ): Promise<{ error: string | null }> {
-  const { error } = await supabase
-    .from('codefile_ratings')
-    .delete()
-    .eq('codefile_id', codefileId)
-    .eq('user_id', userId)
-  return { error: error?.message ?? null }
+  const { error } = await api(`/codefiles/${codefileId}/ratings`, { method: 'DELETE' })
+  return { error }
 }
 
 // ── Comments ─────────────────────────────────────────────────────────────────
 
 export async function fetchComments(codefileId: string): Promise<Comment[]> {
-  const { data } = await supabase
-    .from('codefile_comments')
-    .select('*, profiles(callsign)')
-    .eq('codefile_id', codefileId)
-    .order('created_at', { ascending: true })
-  return (data as Comment[]) ?? []
+  const { data } = await api<Comment[]>(`/codefiles/${codefileId}/comments`)
+  return data ?? []
 }
 
 export async function addComment(
-  codefileId: string, authorId: string, body: string, parentId?: string
+  codefileId: string,
+  _authorId: string,
+  body: string,
+  parentId?: string,
 ): Promise<{ error: string | null }> {
-  const { error } = await supabase
-    .from('codefile_comments')
-    .insert({ codefile_id: codefileId, author_id: authorId, body, parent_id: parentId ?? null })
-  return { error: error?.message ?? null }
+  const { error } = await api(`/codefiles/${codefileId}/comments`, {
+    method: 'POST',
+    body: JSON.stringify({ body, parentId }),
+  })
+  return { error }
 }
 
 export async function deleteComment(commentId: string): Promise<{ error: string | null }> {
-  const { error } = await supabase
-    .from('codefile_comments')
-    .delete()
-    .eq('id', commentId)
-  return { error: error?.message ?? null }
+  const { error } = await api(`/comments/${commentId}`, { method: 'DELETE' })
+  return { error }
 }
 
 // ── Reports ──────────────────────────────────────────────────────────────────
 
 export async function reportContent(
-  reporterId: string,
+  _reporterId: string,
   target: { codefileId?: string; commentId?: string },
-  reason: string
+  reason: string,
 ): Promise<{ error: string | null }> {
-  const { error } = await supabase
-    .from('codefile_reports')
-    .insert({
-      reporter_id: reporterId,
-      codefile_id: target.codefileId ?? null,
-      comment_id: target.commentId ?? null,
-      reason,
-    })
-  return { error: error?.message ?? null }
+  const { error } = await api('/reports', {
+    method: 'POST',
+    body: JSON.stringify({ reason, ...target }),
+  })
+  return { error }
 }

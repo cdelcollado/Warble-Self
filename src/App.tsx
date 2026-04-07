@@ -27,7 +27,16 @@ function App() {
   const [activeTab, setActiveTab] = useState<Tab>('memory');
   const [showConnectionPanel, setShowConnectionPanel] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authInitialMode, setAuthInitialMode] = useState<'login' | 'register' | 'forgot' | 'reset'>('login');
   const [showProfileModal, setShowProfileModal] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('reset') === 'true') {
+      setAuthInitialMode('reset')
+      setShowAuthModal(true)
+    }
+  }, []);
 
   const [channels, setChannels] = useState<MemoryChannel[]>(defaultChannels);
   const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({});
@@ -259,7 +268,7 @@ function App() {
         onTabChange={setActiveTab}
         user={user}
         displayName={displayName}
-        onOpenAuth={() => setShowAuthModal(true)}
+        onOpenAuth={() => { setAuthInitialMode('login'); setShowAuthModal(true) }}
         onOpenProfile={() => setShowProfileModal(true)}
         onSignOut={async () => {
           await signOut();
@@ -334,7 +343,7 @@ function App() {
             <RepositoryPage
               user={user}
               isDarkMode={isDarkMode}
-              onOpenAuth={() => setShowAuthModal(true)}
+              onOpenAuth={() => { setAuthInitialMode('login'); setShowAuthModal(true) }}
               onLoadToEditor={(newChannels, model) => {
                 const detectedDriverId = MODEL_TO_DRIVER_ID[model];
                 if (detectedDriverId && detectedDriverId !== selectedDriverId) {
@@ -408,7 +417,10 @@ function App() {
 
       {/* Auth Modal */}
       {showAuthModal && (
-        <AuthModal onClose={() => setShowAuthModal(false)} />
+        <AuthModal
+          onClose={() => { setShowAuthModal(false); setAuthInitialMode('login') }}
+          initialMode={authInitialMode}
+        />
       )}
 
       {/* Profile Modal */}
