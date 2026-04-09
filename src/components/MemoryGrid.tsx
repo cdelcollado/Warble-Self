@@ -35,7 +35,14 @@ export function MemoryGrid({
   const [rbCountry, setRbCountry] = useState("Spain");
   const [isRbLoading, setIsRbLoading] = useState(false);
   const [userCoords, setUserCoords] = useState<{lat: number, lon: number} | null>(null);
+  const [clearAllPending, setClearAllPending] = useState(false);
   const gridRef = useRef<AgGridReact>(null);
+
+  useEffect(() => {
+    if (!clearAllPending) return;
+    const timer = setTimeout(() => setClearAllPending(false), 3000);
+    return () => clearTimeout(timer);
+  }, [clearAllPending]);
 
   // Memoize the theme so AG Grid does not recreate the UI on theme-only changes
   const gridTheme = useMemo(() => {
@@ -208,10 +215,13 @@ export function MemoryGrid({
   };
 
   const handleClearAll = () => {
-    if (confirm(t('grid.alerts.confirmClearAll') as string || "Are you sure you want to delete ALL channels from the grid? This action cannot be undone.")) {
-      setRowData([]);
-      if (onDataChanged) onDataChanged([]);
+    if (!clearAllPending) {
+      setClearAllPending(true);
+      return;
     }
+    setClearAllPending(false);
+    setRowData([]);
+    if (onDataChanged) onDataChanged([]);
   };
 
   const handleDeleteSelected = () => {
@@ -416,10 +426,10 @@ export function MemoryGrid({
       cellEditorParams: { values: ['High', 'Low'] }
     },
     { field: 'skip', headerName: t('grid.columns.skip'), width: 80, cellEditor: 'agCheckboxCellEditor' },
-    { 
-      field: 'distance', 
-      headerName: 'Distància (km)', 
-      width: 120, 
+    {
+      field: 'distance',
+      headerName: t('grid.columns.distance'),
+      width: 120,
       editable: false,
       valueFormatter: (params: any) => params.value ? `${params.value.toFixed(1)} km` : ''
     }
@@ -441,7 +451,7 @@ export function MemoryGrid({
           {/* Grup 1: Portapapers */}
           <button
             onClick={handlePasteFromClipboard}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
           >
             <Copy className="w-4 h-4" />
             {t('grid.buttons.paste')}
@@ -452,21 +462,21 @@ export function MemoryGrid({
           {/* Grup 2: Afegir canals */}
           <button
             onClick={handleAddChannel}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-900/50 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-900/50 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
           >
             <Plus className="w-4 h-4" />
             {t('grid.buttons.add')}
           </button>
           <button
             onClick={() => setRbModalOpen(true)}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-900/50 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-900/50 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
           >
             <Globe className="w-4 h-4" />
-            Repeaterbook
+            {t('grid.buttons.repeaterbook')}
           </button>
           <button
             onClick={handleAddPMR}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-900/50 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-900/50 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
           >
             <Radio className="w-4 h-4" />
             {t('grid.buttons.addPmr')}
@@ -477,70 +487,80 @@ export function MemoryGrid({
           {/* Grup 3: Esborrar */}
           <button
             onClick={handleClearSelected}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-900/50 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-900/50 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
           >
             <Eraser className="w-4 h-4" />
             {t('grid.buttons.clear')}
           </button>
           <button
             onClick={handleDeleteSelected}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-900/50 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-900/50 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
           >
             <Trash2 className="w-4 h-4" />
             {t('grid.buttons.delete')}
           </button>
+
+          <div className="h-5 w-px bg-slate-200 dark:bg-slate-700 mx-1" />
+
           <button
             onClick={handleClearAll}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/40 border border-red-300 dark:border-red-900/70 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/80 transition-colors"
+            onBlur={() => setClearAllPending(false)}
+            aria-pressed={clearAllPending}
+            aria-label={clearAllPending ? t('grid.alerts.confirmClearAllShort', { count: rowData.length }) : t('grid.buttons.clearAll')}
+            className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
+              clearAllPending
+                ? 'bg-red-600 text-white border-red-700 hover:bg-red-700 font-bold'
+                : 'text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/40 border-red-300 dark:border-red-900/70 hover:bg-red-200 dark:hover:bg-red-900/80'
+            }`}
           >
             <ListX className="w-4 h-4" />
-            {t('grid.buttons.clearAll')}
+            {clearAllPending ? t('grid.alerts.confirmClearAllShort', { count: rowData.length }) : t('grid.buttons.clearAll')}
           </button>
           
           {/* Bulk Edit Options (visible when more than one channel is selected) */}
           {selectedCount > 1 && (
              <div className="flex items-center gap-2 ml-4 pl-4 border-l border-slate-300 dark:border-slate-700 animate-in fade-in slide-in-from-left-4 duration-300">
                <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest">{selectedCount} SELECT.</span>
-               <select 
+               <select
                  className="text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border-none rounded shadow-sm py-1 px-2 focus:ring-2 focus:ring-blue-500 cursor-pointer"
                  onChange={(e) => { if(e.target.value) { handleBulkEdit('power', e.target.value); e.target.value = ''; } }}
                  defaultValue=""
                >
-                 <option value="" disabled>Potència ▾</option>
+                 <option value="" disabled>{t('grid.bulkEdit.power')}</option>
                  <option value="High">High</option>
                  <option value="Low">Low</option>
                </select>
 
-               <select 
+               <select
                  className="text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border-none rounded shadow-sm py-1 px-2 focus:ring-2 focus:ring-blue-500 cursor-pointer"
                  onChange={(e) => { if(e.target.value) { handleBulkEdit('mode', e.target.value); e.target.value = ''; } }}
                  defaultValue=""
                >
-                 <option value="" disabled>Mode ▾</option>
+                 <option value="" disabled>{t('grid.bulkEdit.mode')}</option>
                  <option value="FM">FM</option>
                  <option value="NFM">NFM</option>
                  <option value="AM">AM</option>
                </select>
 
-               <select 
+               <select
                  className="text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border-none rounded shadow-sm py-1 px-2 focus:ring-2 focus:ring-blue-500 cursor-pointer"
                  onChange={(e) => { if(e.target.value) { handleBulkEdit('toneMode', e.target.value); e.target.value = ''; } }}
                  defaultValue=""
                >
-                 <option value="" disabled>Tons ▾</option>
+                 <option value="" disabled>{t('grid.bulkEdit.toneMode')}</option>
                  <option value="None">None</option>
                  <option value="Tone">Tone</option>
                  <option value="TSQL">TSQL</option>
                  <option value="DTCS">DTCS</option>
                  <option value="Cross">Cross</option>
                </select>
-               
-               <select 
+
+               <select
                  className="text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border-none rounded shadow-sm py-1 px-2 focus:ring-2 focus:ring-blue-500 cursor-pointer"
                  onChange={(e) => { if(e.target.value) { handleBulkEdit('duplex', e.target.value); e.target.value = ''; } }}
                  defaultValue=""
                >
-                 <option value="" disabled>Dúplex ▾</option>
+                 <option value="" disabled>{t('grid.bulkEdit.duplex')}</option>
                  <option value="None">None</option>
                  <option value="+">+</option>
                  <option value="-">-</option>
@@ -565,7 +585,7 @@ export function MemoryGrid({
              <button
                key={zone.id}
                onClick={() => handleZoneChange(zone.id)}
-               className={`px-3 py-1 text-xs font-bold rounded-full border transition-all ${
+               className={`px-3 py-2 text-xs font-bold rounded-full border transition-all ${
                  activeZone === zone.id 
                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm' 
                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700'

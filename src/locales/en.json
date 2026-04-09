@@ -72,6 +72,7 @@
       "clear": "Clear",
       "add": "Add Channel",
       "addPmr": "Add PMR",
+      "repeaterbook": "Repeaterbook",
       "delete": "Delete",
       "clearAll": "Clear All"
     },
@@ -80,7 +81,8 @@
       "pasteFallback": "Your browser blocks direct clipboard access. Press Ctrl+V instead of the button.",
       "invalidFrequency": "Invalid frequency. It must be a valid number between 136-174 MHz (VHF) or 400-520 MHz (UHF).",
       "outOfRange": "Frequency out of range for this radio",
-      "confirmClearAll": "Are you sure you want to delete ALL channels from the grid? This action cannot be undone."
+      "confirmClearAll": "Are you sure you want to delete ALL channels from the grid? This action cannot be undone.",
+      "confirmClearAllShort": "Delete all {{count}} channels?"
     },
     "zones": {
       "title": "Channel Groups:",
@@ -105,8 +107,15 @@
       "mode": "Mode",
       "power": "Power",
       "skip": "Skip",
+      "distance": "Distance (km)",
       "timeslot": "Timeslot",
       "talkgroup": "TalkGroup"
+    },
+    "bulkEdit": {
+      "power": "Power ▾",
+      "mode": "Mode ▾",
+      "toneMode": "Tone ▾",
+      "duplex": "Duplex ▾"
     }
   },
   "settings": {

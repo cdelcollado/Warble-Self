@@ -72,6 +72,7 @@
       "clear": "Vaciar",
       "add": "Añadir Canal",
       "addPmr": "Añadir PMR",
+      "repeaterbook": "Repeaterbook",
       "delete": "Eliminar",
       "clearAll": "Vaciar Todo"
     },
@@ -80,7 +81,8 @@
       "pasteFallback": "Tu navegador bloquea el acceso directo al portapapeles. Usa Ctrl+V en lugar de presionar el botón.",
       "invalidFrequency": "Frecuencia inválida. Debe ser un número válido entre 136-174 MHz (VHF) o 400-520 MHz (UHF).",
       "outOfRange": "Frecuencia fuera del rango de esta radio",
-      "confirmClearAll": "¿Estás seguro de que quieres borrar absolutamente TODOS los canales de la tabla? Esta acción no se puede deshacer."
+      "confirmClearAll": "¿Estás seguro de que quieres borrar absolutamente TODOS los canales de la tabla? Esta acción no se puede deshacer.",
+      "confirmClearAllShort": "¿Borrar los {{count}} canales?"
     },
     "zones": {
       "title": "Grupos de Canales:",
@@ -105,8 +107,15 @@
       "mode": "Modo",
       "power": "Potencia",
       "skip": "Saltar",
+      "distance": "Distancia (km)",
       "timeslot": "Timeslot",
       "talkgroup": "TalkGroup"
+    },
+    "bulkEdit": {
+      "power": "Potencia ▾",
+      "mode": "Modo ▾",
+      "toneMode": "Tono ▾",
+      "duplex": "Dúplex ▾"
     }
   },
   "settings": {

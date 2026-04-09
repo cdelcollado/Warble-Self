@@ -56,3 +56,22 @@ A 5-minute CI run catches that before it happens.
 an SSH key stored as `SERVER_SSH_KEY` in GitHub Actions secrets.
 
 **Blocked by:** Validation experiment surviving 2 weeks.
+
+---
+
+## MemoryGrid responsive layout
+
+**What:** Remove or reduce `min-w-[1280px]` on the AG Grid container
+(`src/components/MemoryGrid.tsx:581`). Current value forces horizontal scroll on any
+viewport narrower than 1504px (224px sidebar + 1280px grid), which is most laptops.
+
+**Why:** The grid has 14 columns, many are narrow (80-90px). AG Grid can hide or
+compress less-used columns (dtcsCode, rxDtcsCode, etc.) on smaller viewports instead
+of forcing full-width scroll.
+
+**How to start:** Try removing `min-w-[1280px]` entirely and letting AG Grid handle
+column layout. Use `suppressHorizontalScroll: false` + `autoSizeColumns` for the
+overflow columns, or hide rarely-used columns with `hide: true` by default and expose
+via a column picker.
+
+**Blocked by:** Nothing. Medium priority.

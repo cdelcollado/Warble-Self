@@ -72,6 +72,7 @@
       "clear": "Buidar",
       "add": "Afegir Canal",
       "addPmr": "Afegir PMR",
+      "repeaterbook": "Repeaterbook",
       "delete": "Eliminar",
       "clearAll": "Buidar Tot"
     },
@@ -80,7 +81,8 @@
       "pasteFallback": "El teu navegador bloqueja l'accés directe al portapapers. Fes Ctrl+V enlloc d'apretar el botó.",
       "invalidFrequency": "Freqüència invàlida. Ha de ser un número vàlid entre 136-174 MHz (VHF) o 400-520 MHz (UHF).",
       "outOfRange": "Freqüència fora del rang d'aquesta ràdio",
-      "confirmClearAll": "Estàs segur que vols esborrar absolutament TOTS els canals de la graella? Aquesta acció no es pot desfer."
+      "confirmClearAll": "Estàs segur que vols esborrar absolutament TOTS els canals de la graella? Aquesta acció no es pot desfer.",
+      "confirmClearAllShort": "Esborrar els {{count}} canals?"
     },
     "zones": {
       "title": "Grups de Canals:",
@@ -105,8 +107,15 @@
       "mode": "Mode",
       "power": "Potència",
       "skip": "Saltar",
+      "distance": "Distància (km)",
       "timeslot": "Timeslot",
       "talkgroup": "TalkGroup"
+    },
+    "bulkEdit": {
+      "power": "Potència ▾",
+      "mode": "Mode ▾",
+      "toneMode": "Tons ▾",
+      "duplex": "Dúplex ▾"
     }
   },
   "settings": {
