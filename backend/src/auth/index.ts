@@ -1,8 +1,13 @@
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
+import { Resend } from 'resend'
 import { db } from '../db/index.js'
 import * as schema from '../db/schema.js'
 import { profiles } from '../db/schema.js'
+
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -20,8 +25,20 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     sendResetPassword: async ({ user, url }) => {
-      // Log the reset URL to console for dev environments without email
-      console.log(`[Password Reset] User: ${user.email} — Reset URL: ${url}`)
+      if (resend && process.env.FROM_EMAIL) {
+        await resend.emails.send({
+          from: process.env.FROM_EMAIL,
+          to: user.email,
+          subject: 'Reset your Warble password',
+          html: `<p>Hi ${user.name ?? user.email},</p>
+<p>Click the link below to reset your Warble password. This link expires in 1 hour.</p>
+<p><a href="${url}">${url}</a></p>
+<p>If you did not request a password reset, ignore this email.</p>`,
+        })
+      } else {
+        // Fallback: log to console (dev mode / RESEND_API_KEY not set)
+        console.log(`[Password Reset] User: ${user.email} — Reset URL: ${url}`)
+      }
     },
   },
   databaseHooks: {

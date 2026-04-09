@@ -128,13 +128,11 @@ export async function codefilesRoutes(app: FastifyInstance): Promise<void> {
     }
 
     const chunks: Buffer[] = []
-    let totalSize = 0
     for await (const chunk of data.file) {
-      totalSize += chunk.length
-      if (totalSize > MAX_FILE_SIZE) {
-        return reply.status(400).send(fail('File too large (max 10 MB)'))
-      }
       chunks.push(chunk as Buffer)
+    }
+    if (data.file.truncated) {
+      return reply.status(400).send(fail('File too large (max 10 MB)'))
     }
     const fileBuffer = Buffer.concat(chunks)
 
@@ -203,13 +201,13 @@ export async function codefilesRoutes(app: FastifyInstance): Promise<void> {
   app.post('/codefiles/:id/download', async (req, reply) => {
     const { id } = req.params as { id: string }
 
-    const [codefile] = await db.select().from(codefiles).where(eq(codefiles.id, id))
-    if (!codefile) return reply.status(404).send(fail('Codefile not found'))
-
-    await db
+    const [codefile] = await db
       .update(codefiles)
-      .set({ downloads: codefile.downloads + 1 })
+      .set({ downloads: sql`downloads + 1` })
       .where(eq(codefiles.id, id))
+      .returning()
+
+    if (!codefile) return reply.status(404).send(fail('Codefile not found'))
 
     const url = await getPresignedUrl(codefile.filePath)
     return reply.send(ok({ url, filename: codefile.filePath.split('/').pop() }))

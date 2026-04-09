@@ -1,0 +1,1 @@
+ALTER TABLE "codefile_comments" ADD CONSTRAINT "codefile_comments_parent_id_codefile_comments_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."codefile_comments"("id") ON DELETE set null ON UPDATE no action;

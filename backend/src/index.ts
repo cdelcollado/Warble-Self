@@ -12,6 +12,7 @@ import { codefilesRoutes } from './routes/codefiles.js'
 import { ratingsRoutes } from './routes/ratings.js'
 import { commentsRoutes } from './routes/comments.js'
 import { reportsRoutes } from './routes/reports.js'
+import { adminRoutes } from './routes/admin.js'
 import { fail } from './lib/errors.js'
 
 const app = Fastify({ logger: true })
@@ -75,6 +76,7 @@ await app.register(async (api) => {
   await api.register(ratingsRoutes)
   await api.register(commentsRoutes)
   await api.register(reportsRoutes)
+  await api.register(adminRoutes)
 }, { prefix: '/api' })
 
 // ── Global error handler ──────────────────────────────────────────────────────

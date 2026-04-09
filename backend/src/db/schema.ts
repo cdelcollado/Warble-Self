@@ -1,3 +1,4 @@
+import type { AnyPgColumn } from 'drizzle-orm/pg-core'
 import {
   pgTable,
   text,
@@ -98,7 +99,7 @@ export const codefileComments = pgTable('codefile_comments', {
   id: uuid('id').defaultRandom().primaryKey(),
   codefileId: uuid('codefile_id').notNull().references(() => codefiles.id, { onDelete: 'cascade' }),
   authorId: text('author_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
-  parentId: uuid('parent_id'),
+  parentId: uuid('parent_id').references((): AnyPgColumn => codefileComments.id, { onDelete: 'set null' }),
   body: text('body').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })

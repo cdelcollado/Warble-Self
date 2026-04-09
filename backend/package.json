@@ -7,7 +7,9 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx src/db/migrate.ts"
+    "db:migrate": "tsx src/db/migrate.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.750.0",
@@ -17,17 +19,20 @@
     "@fastify/multipart": "^9.0.3",
     "@fastify/rate-limit": "^10.2.2",
     "better-auth": "^1.2.7",
+    "dotenv": "^16.4.7",
     "drizzle-orm": "^0.41.0",
     "fastify": "^5.3.2",
     "pg": "^8.14.1",
-    "dotenv": "^16.4.7",
+    "resend": "^6.10.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
     "@types/pg": "^8.11.13",
+    "@vitest/coverage-v8": "^2.1.9",
     "drizzle-kit": "^0.31.4",
     "tsx": "^4.19.3",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^2.1.9"
   }
 }
