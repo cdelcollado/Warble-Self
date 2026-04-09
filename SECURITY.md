@@ -4,7 +4,8 @@
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.1.x   | :white_check_mark: |
+| 0.9.x   | :white_check_mark: |
+| 0.1.x   | :x: |
 
 ## Reporting a Vulnerability
 
@@ -29,32 +30,15 @@ If you discover a security vulnerability within Warble, please send an email to 
 
 ### Data Security
 
-- All data processing happens client-side (no server communication except RepeaterBook API)
+- Codeplug files are stored server-side in MinIO (S3-compatible); all uploads require authentication
+- Auth tokens are HTTP-only session cookies managed by Better Auth — never exposed to JavaScript
 - No sensitive data is stored in localStorage
 - Serial port access requires explicit user permission via Web Serial API
+- Local radio programming (read/write) happens entirely client-side; files only leave the browser when the user explicitly uploads to the repository
 
 ### Rate Limiting
 
-Production deployments should implement rate limiting on the RepeaterBook proxy to prevent abuse:
-
-```javascript
-// Example Vercel serverless function with rate limiting
-import rateLimit from '@vercel/rate-limit';
-
-const limiter = rateLimit({
-  interval: 60 * 1000, // 1 minute
-  uniqueTokenPerInterval: 500,
-});
-
-export default async function handler(req, res) {
-  try {
-    await limiter.check(res, 10, 'CACHE_TOKEN'); // 10 requests per minute
-    // ... proxy logic
-  } catch {
-    res.status(429).json({ error: 'Rate limit exceeded' });
-  }
-}
-```
+The Fastify backend applies `@fastify/rate-limit` globally (100 requests/minute per IP by default). Better Auth additionally rate-limits sensitive endpoints such as `/request-password-reset` and `/send-verification-email` independently.
 
 ## Best Practices for Users
 

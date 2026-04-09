@@ -7,12 +7,26 @@ git clone https://github.com/cdelcollado/Warble-postgress.git
 cd Warble-postgress
 
 cp .env.example .env
-# Edit .env: set BETTER_AUTH_SECRET (openssl rand -base64 32), change passwords
+# Edit .env — required values:
+#   BETTER_AUTH_SECRET  → openssl rand -base64 32
+#   ADMIN_SECRET        → openssl rand -base64 32
+#   POSTGRES_PASSWORD   → choose a strong password
+#   MINIO_ACCESS_KEY / MINIO_SECRET_KEY → choose strong values
+#
+# If Caddy serves HTTPS (default for non-localhost domains):
+#   BETTER_AUTH_URL=https://your-domain.com
+#   FRONTEND_URL=https://your-domain.com
+#
+# For localhost with Caddy's auto-HTTPS:
+#   BETTER_AUTH_URL=https://localhost
+#   FRONTEND_URL=https://localhost
 
 docker compose up --build -d
 ```
 
-Open **http://localhost**
+Open **http://localhost** (or **https://localhost** if Caddy issued a local certificate)
+
+> **Port 80 conflict:** If the system nginx is running (`sudo systemctl stop nginx`), stop it before starting the stack.
 
 ## Local Development
 

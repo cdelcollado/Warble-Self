@@ -70,7 +70,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
         setRegistered(true)
       }
     } else if (mode === 'forgot') {
-      const { error: err } = await authApi('/forget-password', {
+      const { error: err } = await authApi('/request-password-reset', {
         method: 'POST',
         body: JSON.stringify({
           email,

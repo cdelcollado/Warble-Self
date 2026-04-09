@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Forgot password flow** (2026-04-09) — the "reset password" email now arrives correctly
+  - `src/auth/AuthModal.tsx` — corrected API endpoint from `/forget-password` to `/request-password-reset` (Better Auth 1.5.x renamed it)
+  - `backend/tsconfig.json` — excluded `src/__tests__/` from production TypeScript build; test files were causing `tsc` to fail with type errors during `docker compose up --build`
+  - `.env.example` — added missing `ADMIN_SECRET` variable (required by `/admin/*` routes but previously undocumented)
+  - `QUICKSTART.md` — documented that `BETTER_AUTH_URL` and `FRONTEND_URL` must use `https://` when Caddy handles TLS, and that system nginx on port 80 must be stopped before starting the stack
+
 ### Added
 - **Self-hosted backend** (2026-04-07)
   - Replaced Supabase with a fully self-hosted stack: Fastify + Better Auth + Drizzle ORM + PostgreSQL + MinIO
