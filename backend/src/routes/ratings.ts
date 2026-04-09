@@ -35,6 +35,7 @@ export async function ratingsRoutes(app: FastifyInstance): Promise<void> {
       .select()
       .from(codefileRatings)
       .where(eq(codefileRatings.codefileId, id))
+      .limit(500)
     return reply.send(ok(rows))
   })
 
