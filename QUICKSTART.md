@@ -1,32 +1,28 @@
-# Warble — Quick Start
+# Warble-Self — Quick Start
+
+Warble-Self is a **single-user, self-hosted** version of Warble. No registration, no login — you're the only user. All uploads and repository actions are attributed to a local `warble` account that is created automatically on first startup.
 
 ## Docker (recommended)
 
 ```bash
-git clone https://github.com/cdelcollado/Warble-postgress.git
-cd Warble-postgress
+git clone https://github.com/cdelcollado/Warble-Self.git
+cd Warble-Self
 
 cp .env.example .env
 # Edit .env — required values:
-#   BETTER_AUTH_SECRET  → openssl rand -base64 32
-#   ADMIN_SECRET        → openssl rand -base64 32
 #   POSTGRES_PASSWORD   → choose a strong password
-#   MINIO_ACCESS_KEY / MINIO_SECRET_KEY → choose strong values
-#
-# If Caddy serves HTTPS (default for non-localhost domains):
-#   BETTER_AUTH_URL=https://your-domain.com
-#   FRONTEND_URL=https://your-domain.com
-#
-# For localhost with Caddy's auto-HTTPS:
-#   BETTER_AUTH_URL=https://localhost
-#   FRONTEND_URL=https://localhost
+#   MINIO_ACCESS_KEY    → choose a username for MinIO
+#   MINIO_SECRET_KEY    → choose a strong password for MinIO
+#   ADMIN_SECRET        → openssl rand -base64 32
+#                         (protects /api/admin/* endpoints)
 
 docker compose up --build -d
 ```
 
-Open **http://localhost** (or **https://localhost** if Caddy issued a local certificate)
+Open **http://localhost** in your browser. No login needed.
 
-> **Port 80 conflict:** If the system nginx is running (`sudo systemctl stop nginx`), stop it before starting the stack.
+> **Port 80 conflict:** If your system nginx is running, stop it first:
+> `sudo systemctl stop nginx`
 
 ## Local Development
 
@@ -40,11 +36,19 @@ cd backend && npm install && npm run dev
 
 # 3. Frontend (new terminal)
 cd ..
-echo "VITE_API_URL=http://localhost:3000" > .env.local
 npm install && npm run dev
 ```
 
-Frontend: http://localhost:5173
+Frontend: http://localhost:5173  
+Backend: http://localhost:3000
+
+## Admin API
+
+The admin endpoints (`GET /api/admin/reports`, `DELETE /api/admin/codefiles/:id`, `DELETE /api/admin/comments/:id`) are protected by `ADMIN_SECRET`. Call them with:
+
+```bash
+curl -H "Authorization: Bearer <ADMIN_SECRET>" http://localhost/api/admin/reports
+```
 
 ## Useful commands
 
@@ -61,4 +65,7 @@ docker compose logs -f frontend
 
 # Rebuild after code changes
 docker compose up --build -d
+
+# Run backend tests
+cd backend && npm test
 ```

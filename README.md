@@ -60,13 +60,8 @@ Available in **Catalan (CA)**, **Spanish (ES)**, and **English (EN)** — auto-d
 - In-browser channel preview powered by Warble's own drivers
 - Load community codeplugs directly into the channel editor
 - Star ratings (1–5), threaded comments, and content reporting
-- Requires a free user account to upload, rate, and comment
 
-### 🔐 User Accounts
-- Email + password registration and login via **Better Auth**
-- Password recovery via email
-- Optional ham radio callsign in user profile
-- Persistent sessions across browser reloads
+> **Single-user mode:** Warble-Self is designed for self-hosted personal use. There is no login or registration — all repository actions are attributed to the local `warble` user automatically.
 
 ---
 
@@ -76,23 +71,18 @@ Available in **Catalan (CA)**, **Spanish (ES)**, and **English (EN)** — auto-d
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/cdelcollado/Warble-postgress.git
-cd Warble-postgress
+git clone https://github.com/cdelcollado/Warble-Self.git
+cd Warble-Self
 
 # 2. Configure secrets
 cp .env.example .env
-# Edit .env and set BETTER_AUTH_SECRET (min 32 chars), change passwords
+# Edit .env — set POSTGRES_PASSWORD, MINIO_ACCESS_KEY, MINIO_SECRET_KEY, ADMIN_SECRET
 
 # 3. Build and start everything
 docker compose up --build -d
 ```
 
-Open **http://localhost** in your browser.
-
-> **Generate a secure secret:**
-> ```bash
-> openssl rand -base64 32
-> ```
+Open **http://localhost** in your browser. No registration required — you're the only user.
 
 ### Option B — Local Development
 
@@ -150,7 +140,6 @@ Backend: **http://localhost:3000**
 | **Icons** | Lucide React | ^0.575 | SVG icon library |
 | **i18n** | i18next + react-i18next | ^25 / ^16 | CA / ES / EN runtime translations |
 | **Backend** | Fastify | ^5.3 | REST API server |
-| **Auth** | Better Auth | ^1.2 | Email/password auth + sessions |
 | **Database** | PostgreSQL + Drizzle ORM | 16 / ^0.41 | Relational data store |
 | **Storage** | MinIO | latest | S3-compatible file storage |
 | **Proxy** | nginx | alpine | Static serving + API proxy |
@@ -165,37 +154,36 @@ Browser
   ▼
 nginx:80
   ├── /api/*  ──► backend (Fastify):3000
-  │                 ├── Better Auth  ──► PostgreSQL
   │                 ├── Drizzle ORM  ──► PostgreSQL
   │                 └── MinIO SDK    ──► MinIO:9000
   └── /*      ──► React SPA (static files)
 ```
+
+> No auth layer. All requests run as the single local user (`LOCAL_USER_ID = 'local'`).
+> The `local` user row is seeded into the DB automatically on first startup.
 
 ### Source Tree
 
 ```
 ├── backend/                    # Fastify API server
 │   ├── src/
-│   │   ├── auth/index.ts       # Better Auth configuration
 │   │   ├── db/
 │   │   │   ├── index.ts        # Drizzle database client
 │   │   │   ├── schema.ts       # PostgreSQL schema
 │   │   │   └── migrate.ts      # Migration runner
+│   │   ├── middleware/auth.ts   # LOCAL_USER_ID constant (no real auth)
 │   │   ├── routes/             # REST API routes
 │   │   │   ├── profiles.ts
 │   │   │   ├── codefiles.ts
 │   │   │   ├── ratings.ts
 │   │   │   ├── comments.ts
-│   │   │   └── reports.ts
+│   │   │   ├── reports.ts
+│   │   │   └── admin.ts        # Admin endpoints (ADMIN_SECRET bearer)
 │   │   ├── storage/minio.ts    # MinIO client
 │   │   └── index.ts            # Fastify app entry point
 │   └── drizzle/migrations/     # SQL migration files
 ├── src/                        # React frontend
 │   ├── App.tsx
-│   ├── auth/
-│   │   ├── AuthModal.tsx       # Login / register / password reset modal
-│   │   ├── ProfileModal.tsx    # User profile editor
-│   │   └── useAuth.ts          # Auth state hook
 │   ├── components/
 │   │   ├── MemoryGrid.tsx      # AG Grid channel editor
 │   │   ├── GlobalSettings.tsx  # Driver-specific settings panel
@@ -243,14 +231,17 @@ export interface IRadioDriver {
 
 | Prefix | Handler | Description |
 |---|---|---|
-| `POST /api/auth/*` | Better Auth | Sign-up, sign-in, sign-out, password reset |
 | `GET/PUT /api/profiles/me` | Drizzle | User profile (callsign, country) |
 | `GET/POST /api/codefiles` | Drizzle + MinIO | List and upload codefiles |
-| `POST /api/codefiles/:id/download` | MinIO | Presigned download URL |
+| `POST /api/codefiles/:id/download` | MinIO | Streams file binary to browser |
 | `GET /api/codefiles/:id/buffer` | MinIO | Binary buffer for in-browser preview |
-| `GET/POST/DELETE /api/ratings` | Drizzle | Star ratings |
-| `GET/POST/DELETE /api/comments` | Drizzle | Threaded comments |
+| `GET/PUT/DELETE /api/codefiles/:id/ratings` | Drizzle | Star ratings |
+| `GET/POST /api/codefiles/:id/comments` | Drizzle | Threaded comments |
+| `DELETE /api/comments/:id` | Drizzle | Delete a comment |
 | `POST /api/reports` | Drizzle | Content reports |
+| `GET /api/admin/reports` | Drizzle | List reports (ADMIN_SECRET required) |
+| `DELETE /api/admin/codefiles/:id` | Drizzle + MinIO | Force-delete codefile (admin) |
+| `DELETE /api/admin/comments/:id` | Drizzle | Force-delete comment (admin) |
 
 ---
 
@@ -264,29 +255,25 @@ POSTGRES_USER=warble
 POSTGRES_PASSWORD=your_secure_password
 POSTGRES_DB=warble
 
-# Better Auth (generate with: openssl rand -base64 32)
-BETTER_AUTH_SECRET=your_32_char_secret
-BETTER_AUTH_URL=http://localhost
-
-# MinIO
+# MinIO (S3-compatible file storage)
 MINIO_ACCESS_KEY=your_minio_user
 MINIO_SECRET_KEY=your_minio_password
 MINIO_BUCKET=codefiles
 
-# Frontend origin (for CORS)
-FRONTEND_URL=http://localhost
+# Admin API (optional — protect /api/admin/* endpoints)
+# Generate with: openssl rand -base64 32
+ADMIN_SECRET=your_admin_secret
 ```
 
-For local dev without Docker, also create `.env.local` at the root:
-```bash
-VITE_API_URL=http://localhost:3000
-```
+No `BETTER_AUTH_SECRET` or auth-related variables needed — there is no authentication.
 
 ---
 
 ## 🧪 Testing
 
 ```bash
+# Backend tests (Vitest)
+cd backend
 npm test              # single run
 npm run test:watch    # watch mode
 npm run test:coverage # coverage report
@@ -304,6 +291,7 @@ npm run test:coverage # coverage report
 | Repository Phase 4 | Ratings, comments & moderation | ✅ 2026-04-02 |
 | Self-hosted backend | Fastify + Better Auth + MinIO | ✅ 2026-04-07 |
 | Full Docker stack | Single `docker compose up` deployment | ✅ 2026-04-07 |
+| Auth-free single-user mode | Removed login/register, local user auto-seeded | ✅ 2026-04-11 |
 
 **Upcoming:**
 - PWA support

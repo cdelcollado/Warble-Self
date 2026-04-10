@@ -7,12 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Auth-free single-user mode** (2026-04-11) — Warble-Self is now a no-login application designed for personal self-hosted use
+  - Removed Better Auth, all auth middleware, login/register UI, and password-reset flow entirely
+  - All backend routes now use `LOCAL_USER_ID = 'local'` — a single `warble` user seeded on first startup
+  - `src/auth/` folder removed (AuthModal, ProfileModal, useAuth)
+  - `backend/src/middleware/auth.ts` — new minimal module exporting only `LOCAL_USER_ID`
+  - `src/repository/useRepository.ts` — fixed BASE URL fallback to `''` (relative, via nginx) so downloads work without CORS errors
+  - Download endpoint now streams file binary through the backend instead of returning a MinIO presigned URL (presigned URLs used the internal Docker hostname `minio:9000` which browsers cannot resolve)
+  - Admin endpoints (`/api/admin/*`) remain protected by `ADMIN_SECRET` bearer token
+  - All 12 backend tests updated and passing
+
 ### Fixed
+- **Missing i18n keys** (2026-04-11) — `repository.card.details` key was missing from `en.json` and `es.json`; "Comments & rating" button was rendering the raw key string
+- **Admin preHandler double-send** (2026-04-11) — `requireAdmin` now throws typed errors instead of calling `reply.send()` in the preHandler, preventing "Cannot write headers after they are sent" in tests
+
+### Fixed (previous)
 - **Forgot password flow** (2026-04-09) — the "reset password" email now arrives correctly
-  - `src/auth/AuthModal.tsx` — corrected API endpoint from `/forget-password` to `/request-password-reset` (Better Auth 1.5.x renamed it)
-  - `backend/tsconfig.json` — excluded `src/__tests__/` from production TypeScript build; test files were causing `tsc` to fail with type errors during `docker compose up --build`
   - `.env.example` — added missing `ADMIN_SECRET` variable (required by `/admin/*` routes but previously undocumented)
-  - `QUICKSTART.md` — documented that `BETTER_AUTH_URL` and `FRONTEND_URL` must use `https://` when Caddy handles TLS, and that system nginx on port 80 must be stopped before starting the stack
+  - `QUICKSTART.md` — documented that system nginx on port 80 must be stopped before starting the stack
 
 ### Added
 - **Self-hosted backend** (2026-04-07)

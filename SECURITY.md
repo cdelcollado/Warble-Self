@@ -30,15 +30,16 @@ If you discover a security vulnerability within Warble, please send an email to 
 
 ### Data Security
 
-- Codeplug files are stored server-side in MinIO (S3-compatible); all uploads require authentication
-- Auth tokens are HTTP-only session cookies managed by Better Auth — never exposed to JavaScript
+- Codeplug files are stored server-side in MinIO (S3-compatible)
+- Warble-Self is a **single-user, self-hosted** app — there is no authentication layer. Deploy it on a trusted network or behind a VPN/firewall; do not expose it directly to the public internet
+- Admin endpoints (`/api/admin/*`) are protected by the `ADMIN_SECRET` bearer token; keep this value secret
 - No sensitive data is stored in localStorage
 - Serial port access requires explicit user permission via Web Serial API
 - Local radio programming (read/write) happens entirely client-side; files only leave the browser when the user explicitly uploads to the repository
 
 ### Rate Limiting
 
-The Fastify backend applies `@fastify/rate-limit` globally (100 requests/minute per IP by default). Better Auth additionally rate-limits sensitive endpoints such as `/request-password-reset` and `/send-verification-email` independently.
+The Fastify backend applies `@fastify/rate-limit` globally (100 requests/minute per IP by default).
 
 ## Best Practices for Users
 

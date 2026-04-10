@@ -556,19 +556,24 @@ Copy `.env.example` to `.env` to configure:
 cp .env.example .env
 ```
 
-Edit `.env`:
+Backend env (`backend/.env`):
 
 ```env
-VITE_REPEATERBOOK_API_URL=https://www.repeaterbook.com/api
-VITE_MAX_FILE_SIZE_MB=10
-VITE_ENABLE_DEBUG=false
+DATABASE_URL=postgres://warble:password@localhost:5432/warble
+MINIO_ENDPOINT=localhost
+MINIO_ACCESS_KEY=your_minio_user
+MINIO_SECRET_KEY=your_minio_password
+MINIO_BUCKET=codefiles
+ADMIN_SECRET=your_admin_secret
 ```
 
-Variables with `VITE_` prefix are available on the client:
+Frontend env vars with `VITE_` prefix are available on the client:
 
 ```typescript
 const maxSize = import.meta.env.VITE_MAX_FILE_SIZE_MB;
 ```
+
+> There is no `BETTER_AUTH_SECRET` or `VITE_API_URL` — Warble-Self is auth-free and the frontend uses relative URLs routed through nginx.
 
 ---
 
@@ -590,4 +595,4 @@ const maxSize = import.meta.env.VITE_MAX_FILE_SIZE_MB;
 
 ---
 
-**Last updated**: 2026-04-03
+**Last updated**: 2026-04-11
