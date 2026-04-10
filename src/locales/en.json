@@ -251,7 +251,8 @@
       "download": "Download",
       "downloading": "Downloading...",
       "loginToDownload": "Sign in to download",
-      "preview": "Preview"
+      "preview": "Preview",
+      "details": "Comments & rating"
     },
     "preview": {
       "loading": "Loading channels...",

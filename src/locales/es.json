@@ -251,7 +251,8 @@
       "download": "Descargar",
       "downloading": "Descargando...",
       "loginToDownload": "Inicia sesión para descargar",
-      "preview": "Previsualizar"
+      "preview": "Previsualizar",
+      "details": "Comentarios y valoración"
     },
     "preview": {
       "loading": "Cargando canales...",
