@@ -4,8 +4,8 @@ import cors from '@fastify/cors'
 import helmet from '@fastify/helmet'
 import multipart from '@fastify/multipart'
 import rateLimit from '@fastify/rate-limit'
-import { toNodeHandler } from 'better-auth/node'
-import { auth } from './auth/index.js'
+import { db } from './db/index.js'
+import { user as userTable, profiles } from './db/schema.js'
 import { ensureBucket } from './storage/minio.js'
 import { profilesRoutes } from './routes/profiles.js'
 import { codefilesRoutes } from './routes/codefiles.js'
@@ -13,6 +13,7 @@ import { ratingsRoutes } from './routes/ratings.js'
 import { commentsRoutes } from './routes/comments.js'
 import { reportsRoutes } from './routes/reports.js'
 import { adminRoutes } from './routes/admin.js'
+import { LOCAL_USER_ID } from './middleware/auth.js'
 import { fail } from './lib/errors.js'
 
 const app = Fastify({ logger: true })
@@ -38,34 +39,12 @@ await app.register(multipart, {
   limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
 })
 
-// ── Better Auth — must run before Fastify routing ────────────────────────────
-// Better Auth uses the Node.js http handler interface
+// ── JSON body parser ──────────────────────────────────────────────────────────
 app.addContentTypeParser('application/json', { parseAs: 'string' }, (req, body, done) => {
   try {
     done(null, JSON.parse(body as string))
   } catch (e) {
     done(e instanceof Error ? e : new Error(String(e)))
-  }
-})
-
-const authHandler = toNodeHandler(auth)
-
-app.addHook('onRequest', async (req, reply) => {
-  if (req.url?.startsWith('/api/auth/')) {
-    const origin = process.env.FRONTEND_URL!
-    reply.raw.setHeader('Access-Control-Allow-Origin', origin)
-    reply.raw.setHeader('Access-Control-Allow-Credentials', 'true')
-    reply.raw.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
-    reply.raw.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-
-    if (req.method === 'OPTIONS') {
-      reply.raw.writeHead(204)
-      reply.raw.end()
-      return
-    }
-
-    reply.hijack()
-    await authHandler(req.raw, reply.raw)
   }
 })
 
@@ -86,9 +65,23 @@ app.setErrorHandler((err: Error & { statusCode?: number }, _req, reply) => {
   reply.status(status).send(fail(status === 500 ? 'Internal server error' : err.message))
 })
 
+// ── Seed local user ───────────────────────────────────────────────────────────
+async function seedLocalUser(): Promise<void> {
+  const now = new Date()
+  await db
+    .insert(userTable)
+    .values({ id: LOCAL_USER_ID, name: 'Local', email: 'local@localhost', emailVerified: true, createdAt: now, updatedAt: now })
+    .onConflictDoNothing()
+  await db
+    .insert(profiles)
+    .values({ id: LOCAL_USER_ID, callsign: null, country: null })
+    .onConflictDoNothing()
+}
+
 // ── Start ─────────────────────────────────────────────────────────────────────
 async function start(): Promise<void> {
   await ensureBucket()
+  await seedLocalUser()
   await app.listen({ port: 3000, host: '0.0.0.0' })
 }
 

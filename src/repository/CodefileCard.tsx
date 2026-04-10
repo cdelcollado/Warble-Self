@@ -1,7 +1,6 @@
-import { Download, MapPin, Radio, User, LogIn, Eye, MessageSquare, Star } from 'lucide-react'
+import { Download, MapPin, Radio, User, Eye, MessageSquare, Star } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
-import type { AuthUser } from '../auth/useAuth'
 import type { CodefileWithAuthor } from '../lib/catalog'
 import type { MemoryChannel } from '../lib/types'
 import { downloadCodefile } from './useRepository'
@@ -9,19 +8,16 @@ import { PreviewModal } from './PreviewModal'
 import { CodefileDetailModal } from './CodefileDetailModal'
 import { Button } from '../components/ui/Button'
 
-// Models with an available preview driver
 const PREVIEWABLE_MODELS = new Set(['UV-5R', 'UV-5R MINI'])
 
 interface CodefileCardProps {
   codefile: CodefileWithAuthor
-  user: AuthUser | null
   isDarkMode: boolean
-  onOpenAuth: () => void
   onDownloaded: () => void
   onLoadToEditor: (channels: MemoryChannel[], model: string) => void
 }
 
-export function CodefileCard({ codefile, user, isDarkMode, onOpenAuth, onDownloaded, onLoadToEditor }: CodefileCardProps) {
+export function CodefileCard({ codefile, isDarkMode, onDownloaded, onLoadToEditor }: CodefileCardProps) {
   const { t } = useTranslation()
   const [downloading, setDownloading] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
@@ -44,7 +40,7 @@ export function CodefileCard({ codefile, user, isDarkMode, onOpenAuth, onDownloa
 
   return (
     <div className="flex flex-col gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md hover:shadow-slate-200/70 dark:hover:shadow-slate-950/50 transition-all overflow-hidden">
-      {/* Top row: format badge + brand/model */}
+      {/* Top row: format badge + title */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex flex-col gap-0.5 min-w-0">
           <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate leading-snug">
@@ -108,17 +104,10 @@ export function CodefileCard({ codefile, user, isDarkMode, onOpenAuth, onDownloa
               {t('repository.card.preview')}
             </Button>
           )}
-          {user ? (
-            <Button variant="primary" size="sm" onClick={handleDownload} disabled={downloading}>
-              <Download className="w-3 h-3" />
-              {downloading ? t('repository.card.downloading') : t('repository.card.download')}
-            </Button>
-          ) : (
-            <Button variant="outline" size="sm" onClick={onOpenAuth}>
-              <LogIn className="w-3 h-3" />
-              {t('repository.card.loginToDownload')}
-            </Button>
-          )}
+          <Button variant="primary" size="sm" onClick={handleDownload} disabled={downloading}>
+            <Download className="w-3 h-3" />
+            {downloading ? t('repository.card.downloading') : t('repository.card.download')}
+          </Button>
         </div>
       </div>
 
@@ -134,9 +123,8 @@ export function CodefileCard({ codefile, user, isDarkMode, onOpenAuth, onDownloa
       {showDetail && (
         <CodefileDetailModal
           codefile={codefile}
-          user={user}
           onClose={() => setShowDetail(false)}
-          onOpenAuth={onOpenAuth}
+          onDeleted={() => { setShowDetail(false); onDownloaded() }}
         />
       )}
     </div>

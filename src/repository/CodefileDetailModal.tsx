@@ -1,14 +1,12 @@
 import { useEffect, useState, useRef } from 'react'
-import { X, Star, MessageSquare, Flag, Trash2, CornerDownRight, Send, Download, MapPin, Radio, User } from 'lucide-react'
+import { X, Star, MessageSquare, Trash2, CornerDownRight, Send, Download, MapPin, Radio, User } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import type { AuthUser } from '../auth/useAuth'
 import type { CodefileWithAuthor, Comment, Rating } from '../lib/catalog'
 import {
   fetchRatings, upsertRating, deleteRating,
-  fetchComments, addComment, deleteComment, reportContent,
+  fetchComments, addComment, deleteComment,
+  deleteCodefile,
 } from './useRepository'
-
-// ── Utilitats ────────────────────────────────────────────────────────────────
 
 function relativeTime(date: string, locale: string): string {
   const diff = (new Date(date).getTime() - Date.now()) / 1000
@@ -24,8 +22,6 @@ function avgRating(ratings: Rating[]): number {
   if (!ratings.length) return 0
   return ratings.reduce((s, r) => s + r.rating, 0) / ratings.length
 }
-
-// ── StarRating ───────────────────────────────────────────────────────────────
 
 function StarRating({
   value, interactive, onChange,
@@ -57,56 +53,19 @@ function StarRating({
   )
 }
 
-// ── ReportDialog ─────────────────────────────────────────────────────────────
-
-function ReportDialog({
-  onConfirm, onCancel,
-}: { onConfirm: (reason: string) => void; onCancel: () => void }) {
-  const { t } = useTranslation()
-  const [reason, setReason] = useState('')
-  return (
-    <div className="flex flex-col gap-2 p-3 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800">
-      <textarea
-        value={reason}
-        onChange={e => setReason(e.target.value)}
-        placeholder={t('repository.detail.reportReason')}
-        rows={2}
-        maxLength={300}
-        className="w-full text-xs px-2 py-1.5 rounded-lg border border-red-200 dark:border-red-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-400 resize-none"
-      />
-      <div className="flex justify-end gap-2">
-        <button onClick={onCancel} className="text-xs px-3 py-1 rounded-lg text-slate-500 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
-          {t('app.driverMismatch.cancel')}
-        </button>
-        <button
-          onClick={() => onConfirm(reason)}
-          className="text-xs px-3 py-1 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition-colors"
-        >
-          {t('repository.detail.reportConfirm')}
-        </button>
-      </div>
-    </div>
-  )
-}
-
-// ── CommentItem ───────────────────────────────────────────────────────────────
-
 function CommentItem({
-  comment, replies, user, locale,
-  onReply, onDelete, onReport,
+  comment, replies, locale,
+  onReply, onDelete,
 }: {
   comment: Comment
   replies: Comment[]
-  user: AuthUser | null
   locale: string
   onReply: (parentId: string, body: string) => Promise<void>
   onDelete: (id: string) => void
-  onReport: (commentId: string, reason: string) => Promise<void>
 }) {
   const { t } = useTranslation()
   const [showReply, setShowReply] = useState(false)
   const [replyBody, setReplyBody] = useState('')
-  const [showReport, setShowReport] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const author = comment.profiles?.callsign ?? t('repository.card.unknownAuthor')
 
@@ -121,7 +80,6 @@ function CommentItem({
 
   return (
     <div className="flex flex-col gap-2">
-      {/* Comment */}
       <div className="flex gap-2.5">
         <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 text-xs font-bold flex items-center justify-center shrink-0">
           {author[0]?.toUpperCase() ?? '?'}
@@ -133,33 +91,15 @@ function CommentItem({
           </div>
           <p className="text-sm text-slate-700 dark:text-slate-300 mt-0.5 leading-relaxed whitespace-pre-wrap break-words">{comment.body}</p>
           <div className="flex items-center gap-3 mt-1">
-            {user && (
-              <button onClick={() => setShowReply(v => !v)} className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
-                <CornerDownRight className="w-3 h-3" />
-                {t('repository.detail.reply')}
-              </button>
-            )}
-            {user && user.id !== comment.authorId && (
-              <button onClick={() => setShowReport(v => !v)} className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
-                <Flag className="w-3 h-3" />
-                {t('repository.detail.report')}
-              </button>
-            )}
-            {user && user.id === comment.authorId && (
-              <button onClick={() => onDelete(comment.id)} className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
-                <Trash2 className="w-3 h-3" />
-                {t('repository.detail.delete')}
-              </button>
-            )}
+            <button onClick={() => setShowReply(v => !v)} className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
+              <CornerDownRight className="w-3 h-3" />
+              {t('repository.detail.reply')}
+            </button>
+            <button onClick={() => onDelete(comment.id)} className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
+              <Trash2 className="w-3 h-3" />
+              {t('repository.detail.delete')}
+            </button>
           </div>
-          {showReport && (
-            <div className="mt-2">
-              <ReportDialog
-                onConfirm={async reason => { await onReport(comment.id, reason); setShowReport(false) }}
-                onCancel={() => setShowReport(false)}
-              />
-            </div>
-          )}
           {showReply && (
             <div className="mt-2 flex gap-2">
               <textarea
@@ -182,7 +122,6 @@ function CommentItem({
         </div>
       </div>
 
-      {/* Replies */}
       {replies.length > 0 && (
         <div className="ml-9 flex flex-col gap-2 pl-3 border-l-2 border-slate-100 dark:border-slate-800">
           {replies.map(reply => {
@@ -199,18 +138,10 @@ function CommentItem({
                   </div>
                   <p className="text-sm text-slate-700 dark:text-slate-300 mt-0.5 leading-relaxed whitespace-pre-wrap break-words">{reply.body}</p>
                   <div className="flex items-center gap-3 mt-1">
-                    {user && user.id !== reply.authorId && (
-                      <button onClick={() => onReport(reply.id, '')} className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
-                        <Flag className="w-3 h-3" />
-                        {t('repository.detail.report')}
-                      </button>
-                    )}
-                    {user && user.id === reply.authorId && (
-                      <button onClick={() => onDelete(reply.id)} className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
-                        <Trash2 className="w-3 h-3" />
-                        {t('repository.detail.delete')}
-                      </button>
-                    )}
+                    <button onClick={() => onDelete(reply.id)} className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
+                      <Trash2 className="w-3 h-3" />
+                      {t('repository.detail.delete')}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -222,16 +153,13 @@ function CommentItem({
   )
 }
 
-// ── CodefileDetailModal ───────────────────────────────────────────────────────
-
 interface CodefileDetailModalProps {
   codefile: CodefileWithAuthor
-  user: AuthUser | null
   onClose: () => void
-  onOpenAuth: () => void
+  onDeleted: () => void
 }
 
-export function CodefileDetailModal({ codefile, user, onClose, onOpenAuth }: CodefileDetailModalProps) {
+export function CodefileDetailModal({ codefile, onClose, onDeleted }: CodefileDetailModalProps) {
   const { t, i18n } = useTranslation()
   const locale = i18n.resolvedLanguage ?? i18n.language
 
@@ -239,74 +167,57 @@ export function CodefileDetailModal({ codefile, user, onClose, onOpenAuth }: Cod
   const [comments, setComments] = useState<Comment[]>([])
   const [newComment, setNewComment] = useState('')
   const [submittingComment, setSubmittingComment] = useState(false)
-  const [showReportModal, setShowReportModal] = useState(false)
   const commentInputRef = useRef<HTMLTextAreaElement>(null)
 
   const avg = avgRating(ratings)
-  const userRating = ratings.find(r => r.userId === user?.id)?.rating ?? 0
+  const myRating = ratings.find(r => r.userId === 'local')?.rating ?? 0
   const author = codefile.profiles?.callsign ?? t('repository.card.unknownAuthor')
   const location = [codefile.region, codefile.country].filter(Boolean).join(', ')
 
-  // Carrega dades
   useEffect(() => {
     fetchRatings(codefile.id).then(setRatings)
     fetchComments(codefile.id).then(setComments)
   }, [codefile.id])
 
-  // Rating
   const handleRate = async (value: number) => {
-    if (!user) { onOpenAuth(); return }
     if (value === 0) {
-      await deleteRating(codefile.id, user.id)
-      setRatings(prev => prev.filter(r => r.userId !== user.id))
+      await deleteRating(codefile.id, 'local')
+      setRatings(prev => prev.filter(r => r.userId !== 'local'))
     } else {
-      await upsertRating(codefile.id, user.id, value)
+      await upsertRating(codefile.id, 'local', value)
       setRatings(prev => {
-        const without = prev.filter(r => r.userId !== user.id)
-        return [...without, { id: '', codefileId: codefile.id, userId: user.id, rating: value, createdAt: new Date().toISOString() }]
+        const without = prev.filter(r => r.userId !== 'local')
+        return [...without, { id: '', codefileId: codefile.id, userId: 'local', rating: value, createdAt: new Date().toISOString() }]
       })
     }
   }
 
-  // Comentari arrel
   const handleAddComment = async () => {
-    if (!user || !newComment.trim()) return
+    if (!newComment.trim()) return
     setSubmittingComment(true)
-    await addComment(codefile.id, user.id, newComment.trim())
+    await addComment(codefile.id, 'local', newComment.trim())
     setNewComment('')
     const updated = await fetchComments(codefile.id)
     setComments(updated)
     setSubmittingComment(false)
   }
 
-  // Resposta
   const handleReply = async (parentId: string, body: string) => {
-    if (!user) return
-    await addComment(codefile.id, user.id, body, parentId)
+    await addComment(codefile.id, 'local', body, parentId)
     const updated = await fetchComments(codefile.id)
     setComments(updated)
   }
 
-  // Esborrar
-  const handleDelete = async (id: string) => {
+  const handleDeleteComment = async (id: string) => {
     await deleteComment(id)
     setComments(prev => prev.filter(c => c.id !== id && c.parentId !== id))
   }
 
-  // Report comment
-  const handleReportComment = async (commentId: string, reason: string) => {
-    if (!user) return
-    await reportContent(user.id, { commentId }, reason)
+  const handleDeleteCodefile = async () => {
+    await deleteCodefile(codefile.id)
+    onDeleted()
   }
 
-  // Report codefile
-  const handleReportCodefile = async (reason: string) => {
-    if (!user) return
-    await reportContent(user.id, { codefileId: codefile.id }, reason)
-    setShowReportModal(false)
-  }
-
-  // Organise comments into a tree (root + replies)
   const rootComments = comments.filter(c => !c.parentId)
   const repliesMap: Record<string, Comment[]> = {}
   comments.filter(c => c.parentId).forEach(c => {
@@ -340,31 +251,31 @@ export function CodefileDetailModal({ codefile, user, onClose, onOpenAuth }: Cod
               <span className="flex items-center gap-1"><Download className="w-3 h-3" />{codefile.downloads}</span>
             </div>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 shrink-0 transition-colors">
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              onClick={handleDeleteCodefile}
+              className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+              title={t('repository.detail.delete')}
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-5">
 
-          {/* Description */}
           {codefile.description && (
             <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{codefile.description}</p>
           )}
 
           {/* Rating */}
           <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                {t('repository.detail.rating')}
-              </span>
-              {user && (
-                <button onClick={() => setShowReportModal(v => !v)} className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
-                  <Flag className="w-3 h-3" />
-                  {t('repository.detail.reportCodefile')}
-                </button>
-              )}
-            </div>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+              {t('repository.detail.rating')}
+            </span>
             <div className="flex items-center gap-3">
               {avg > 0 ? (
                 <>
@@ -376,24 +287,15 @@ export function CodefileDetailModal({ codefile, user, onClose, onOpenAuth }: Cod
                 <span className="text-xs text-slate-400 dark:text-slate-500">{t('repository.detail.noRatings')}</span>
               )}
             </div>
-            {user ? (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-500 dark:text-slate-400">{t('repository.detail.yourRating')}:</span>
-                <StarRating value={userRating} interactive onChange={handleRate} />
-                {userRating > 0 && (
-                  <button onClick={() => handleRate(0)} className="text-[10px] text-slate-400 hover:text-red-400 transition-colors">
-                    {t('repository.detail.removeRating')}
-                  </button>
-                )}
-              </div>
-            ) : (
-              <button onClick={onOpenAuth} className="text-xs text-blue-600 dark:text-blue-400 hover:underline text-left">
-                {t('repository.detail.loginToRate')}
-              </button>
-            )}
-            {showReportModal && (
-              <ReportDialog onConfirm={handleReportCodefile} onCancel={() => setShowReportModal(false)} />
-            )}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-500 dark:text-slate-400">{t('repository.detail.yourRating')}:</span>
+              <StarRating value={myRating} interactive onChange={handleRate} />
+              {myRating > 0 && (
+                <button onClick={() => handleRate(0)} className="text-[10px] text-slate-400 hover:text-red-400 transition-colors">
+                  {t('repository.detail.removeRating')}
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Comments */}
@@ -403,34 +305,26 @@ export function CodefileDetailModal({ codefile, user, onClose, onOpenAuth }: Cod
               {t('repository.detail.comments')} ({rootComments.length})
             </span>
 
-            {/* Add comment */}
-            {user ? (
-              <div className="flex gap-2">
-                <textarea
-                  ref={commentInputRef}
-                  value={newComment}
-                  onChange={e => setNewComment(e.target.value)}
-                  placeholder={t('repository.detail.commentPlaceholder')}
-                  rows={2}
-                  maxLength={2000}
-                  onKeyDown={e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleAddComment() }}
-                  className="flex-1 text-sm px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                />
-                <button
-                  onClick={handleAddComment}
-                  disabled={submittingComment || !newComment.trim()}
-                  className="self-end p-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-40 transition-colors"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ) : (
-              <button onClick={onOpenAuth} className="text-xs text-blue-600 dark:text-blue-400 hover:underline text-left">
-                {t('repository.detail.loginToComment')}
+            <div className="flex gap-2">
+              <textarea
+                ref={commentInputRef}
+                value={newComment}
+                onChange={e => setNewComment(e.target.value)}
+                placeholder={t('repository.detail.commentPlaceholder')}
+                rows={2}
+                maxLength={2000}
+                onKeyDown={e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleAddComment() }}
+                className="flex-1 text-sm px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              />
+              <button
+                onClick={handleAddComment}
+                disabled={submittingComment || !newComment.trim()}
+                className="self-end p-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-40 transition-colors"
+              >
+                <Send className="w-3.5 h-3.5" />
               </button>
-            )}
+            </div>
 
-            {/* Comment list */}
             {rootComments.length === 0 ? (
               <p className="text-xs text-slate-400 dark:text-slate-500 text-center py-4">{t('repository.detail.noComments')}</p>
             ) : (
@@ -440,11 +334,9 @@ export function CodefileDetailModal({ codefile, user, onClose, onOpenAuth }: Cod
                     key={c.id}
                     comment={c}
                     replies={repliesMap[c.id] ?? []}
-                    user={user}
                     locale={locale}
                     onReply={handleReply}
-                    onDelete={handleDelete}
-                    onReport={handleReportComment}
+                    onDelete={handleDeleteComment}
                   />
                 ))}
               </div>
@@ -452,7 +344,6 @@ export function CodefileDetailModal({ codefile, user, onClose, onOpenAuth }: Cod
           </div>
         </div>
 
-        {/* Footer */}
         <div className="flex justify-end px-6 py-4 border-t border-slate-100 dark:border-slate-800">
           <button onClick={onClose} className="px-4 py-2 text-sm rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
             {t('auth.close')}

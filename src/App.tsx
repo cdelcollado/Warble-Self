@@ -7,9 +7,6 @@ import type { MemoryChannel, GlobalSettings, SettingDef } from './lib/types';
 import { defaultChannels } from './lib/types';
 import { GlobalSettingsView } from './components/GlobalSettings';
 import { useToast } from './hooks/useToast';
-import { useAuth } from './auth/useAuth';
-import { AuthModal } from './auth/AuthModal';
-import { ProfileModal } from './auth/ProfileModal';
 import { RepositoryPage } from './repository/RepositoryPage';
 import { Sidebar } from './components/Sidebar';
 import { detectRadioFromImg, MODEL_TO_DRIVER_ID } from './lib/imgDetection';
@@ -22,21 +19,9 @@ type Tab = 'memory' | 'settings' | 'repository'
 function App() {
   const { t } = useTranslation();
   const toast = useToast();
-  const { user, displayName, signOut } = useAuth();
 
   const [activeTab, setActiveTab] = useState<Tab>('memory');
   const [showConnectionPanel, setShowConnectionPanel] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authInitialMode, setAuthInitialMode] = useState<'login' | 'register' | 'forgot' | 'reset'>('login');
-  const [showProfileModal, setShowProfileModal] = useState(false);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    if (params.get('reset') === 'true') {
-      setAuthInitialMode('reset')
-      setShowAuthModal(true)
-    }
-  }, []);
 
   const [channels, setChannels] = useState<MemoryChannel[]>(defaultChannels);
   const [globalSettings, setGlobalSettings] = useState<GlobalSettings>({});
@@ -266,14 +251,6 @@ function App() {
       <Sidebar
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        user={user}
-        displayName={displayName}
-        onOpenAuth={() => { setAuthInitialMode('login'); setShowAuthModal(true) }}
-        onOpenProfile={() => setShowProfileModal(true)}
-        onSignOut={async () => {
-          await signOut();
-          toast.success(t('auth.success.loggedOut'));
-        }}
         isDarkMode={isDarkMode}
         onToggleDarkMode={() => setIsDarkMode(prev => !prev)}
         selectedDriverId={selectedDriverId}
@@ -341,13 +318,10 @@ function App() {
         ) : activeTab === 'repository' ? (
           <div className="flex-1 overflow-y-auto p-6">
             <RepositoryPage
-              user={user}
               isDarkMode={isDarkMode}
-              onOpenAuth={() => { setAuthInitialMode('login'); setShowAuthModal(true) }}
               onLoadToEditor={(newChannels, model) => {
                 const detectedDriverId = MODEL_TO_DRIVER_ID[model];
                 if (detectedDriverId && detectedDriverId !== selectedDriverId) {
-                  // Auto-switch driver — the user has already seen the preview for the correct model
                   handleDriverChange(detectedDriverId);
                 }
                 setChannels(newChannels);
@@ -414,19 +388,6 @@ function App() {
           />
         </div>
       </div>
-
-      {/* Auth Modal */}
-      {showAuthModal && (
-        <AuthModal
-          onClose={() => { setShowAuthModal(false); setAuthInitialMode('login') }}
-          initialMode={authInitialMode}
-        />
-      )}
-
-      {/* Profile Modal */}
-      {showProfileModal && user && (
-        <ProfileModal user={user} onClose={() => setShowProfileModal(false)} />
-      )}
 
       {/* Driver Mismatch Modal */}
       {driverMismatch && (

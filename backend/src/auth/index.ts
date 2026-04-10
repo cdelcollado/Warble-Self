@@ -24,6 +24,7 @@ export const auth = betterAuth({
   trustedOrigins: [process.env.FRONTEND_URL!],
   emailAndPassword: {
     enabled: true,
+    disableSignUp: true,
     sendResetPassword: async ({ user, url }) => {
       if (resend && process.env.FROM_EMAIL) {
         await resend.emails.send({

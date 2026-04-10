@@ -152,6 +152,11 @@ export async function deleteComment(commentId: string): Promise<{ error: string 
   return { error }
 }
 
+export async function deleteCodefile(codefileId: string): Promise<{ error: string | null }> {
+  const { error } = await api(`/codefiles/${codefileId}`, { method: 'DELETE' })
+  return { error }
+}
+
 // ── Reports ──────────────────────────────────────────────────────────────────
 
 export async function reportContent(

@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react'
 import { Database, Search, Upload, Filter, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import type { AuthUser } from '../auth/useAuth'
 import { RADIO_BRANDS } from '../lib/catalog'
 import { useRepository, type RepositoryFilters } from './useRepository'
 import { CodefileCard } from './CodefileCard'
@@ -10,9 +9,7 @@ import type { MemoryChannel } from '../lib/types'
 import { Button } from '../components/ui/Button'
 
 interface RepositoryPageProps {
-  user: AuthUser | null
   isDarkMode: boolean
-  onOpenAuth: () => void
   onLoadToEditor: (channels: MemoryChannel[], model: string) => void
 }
 
@@ -26,7 +23,7 @@ const DEFAULT_FILTERS: RepositoryFilters = {
   sortBy: 'newest',
 }
 
-export function RepositoryPage({ user, isDarkMode, onOpenAuth, onLoadToEditor }: RepositoryPageProps) {
+export function RepositoryPage({ isDarkMode, onLoadToEditor }: RepositoryPageProps) {
   const { t } = useTranslation()
   const [filters, setFilters] = useState<RepositoryFilters>(DEFAULT_FILTERS)
   const [pendingSearch, setPendingSearch] = useState('')
@@ -76,16 +73,10 @@ export function RepositoryPage({ user, isDarkMode, onOpenAuth, onLoadToEditor }:
           </p>
         </div>
 
-        {user ? (
-          <Button variant="primary" onClick={() => setShowUpload(true)}>
-            <Upload className="w-4 h-4" />
-            {t('repository.upload.button')}
-          </Button>
-        ) : (
-          <Button variant="primary" onClick={onOpenAuth}>
-            {t('repository.loginToUpload')}
-          </Button>
-        )}
+        <Button variant="primary" onClick={() => setShowUpload(true)}>
+          <Upload className="w-4 h-4" />
+          {t('repository.upload.button')}
+        </Button>
       </div>
 
       {/* Search bar */}
@@ -123,7 +114,6 @@ export function RepositoryPage({ user, isDarkMode, onOpenAuth, onLoadToEditor }:
       {/* Filter panel */}
       {showFilters && (
         <div className="flex flex-wrap items-end gap-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
-          {/* Brand */}
           <div className="flex flex-col gap-1 min-w-[140px]">
             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
               {t('repository.upload.brand')}
@@ -140,7 +130,6 @@ export function RepositoryPage({ user, isDarkMode, onOpenAuth, onLoadToEditor }:
             </select>
           </div>
 
-          {/* Model */}
           <div className="flex flex-col gap-1 min-w-[160px]">
             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
               {t('repository.upload.model')}
@@ -149,7 +138,7 @@ export function RepositoryPage({ user, isDarkMode, onOpenAuth, onLoadToEditor }:
               value={filters.model}
               onChange={e => setFilter('model', e.target.value)}
               disabled={!filters.brand}
-              className="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-40"
+              className="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-40"
             >
               <option value="">{t('repository.filter.allModels')}</option>
               {models.map(m => (
@@ -158,7 +147,6 @@ export function RepositoryPage({ user, isDarkMode, onOpenAuth, onLoadToEditor }:
             </select>
           </div>
 
-          {/* Country */}
           <div className="flex flex-col gap-1 min-w-[140px]">
             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
               {t('repository.upload.country')}
@@ -172,7 +160,6 @@ export function RepositoryPage({ user, isDarkMode, onOpenAuth, onLoadToEditor }:
             />
           </div>
 
-          {/* Sort */}
           <div className="flex flex-col gap-1 min-w-[160px]">
             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
               {t('repository.filter.sortBy')}
@@ -224,9 +211,7 @@ export function RepositoryPage({ user, isDarkMode, onOpenAuth, onLoadToEditor }:
             <CodefileCard
               key={cf.id}
               codefile={cf}
-              user={user}
               isDarkMode={isDarkMode}
-              onOpenAuth={onOpenAuth}
               onDownloaded={refetch}
               onLoadToEditor={onLoadToEditor}
             />
@@ -258,9 +243,8 @@ export function RepositoryPage({ user, isDarkMode, onOpenAuth, onLoadToEditor }:
       )}
 
       {/* Upload modal */}
-      {showUpload && user && (
+      {showUpload && (
         <UploadModal
-          user={user}
           onClose={() => setShowUpload(false)}
           onSuccess={() => {
             setShowUpload(false)

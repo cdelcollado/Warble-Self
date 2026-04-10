@@ -2,7 +2,7 @@ import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { db } from '../db/index.js'
 import { codefileReports } from '../db/schema.js'
-import { requireAuth } from '../middleware/auth.js'
+import { LOCAL_USER_ID } from '../middleware/auth.js'
 import { ok, fail } from '../lib/errors.js'
 
 const reportSchema = z.object({
@@ -15,12 +15,12 @@ const reportSchema = z.object({
 )
 
 export async function reportsRoutes(app: FastifyInstance): Promise<void> {
-  app.post('/reports', { preHandler: requireAuth }, async (req, reply) => {
+  app.post('/reports', async (req, reply) => {
     const parsed = reportSchema.safeParse(req.body)
     if (!parsed.success) return reply.status(400).send(fail(parsed.error.message))
 
     await db.insert(codefileReports).values({
-      reporterId: req.user!.id,
+      reporterId: LOCAL_USER_ID,
       codefileId: parsed.data.codefileId ?? null,
       commentId: parsed.data.commentId ?? null,
       reason: parsed.data.reason,

@@ -3,7 +3,7 @@ import { eq, asc } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '../db/index.js'
 import { codefileComments, profiles } from '../db/schema.js'
-import { requireAuth } from '../middleware/auth.js'
+import { LOCAL_USER_ID } from '../middleware/auth.js'
 import { ok, fail } from '../lib/errors.js'
 
 const commentSchema = z.object({
@@ -33,7 +33,7 @@ export async function commentsRoutes(app: FastifyInstance): Promise<void> {
     return reply.send(ok(rows))
   })
 
-  app.post('/codefiles/:id/comments', { preHandler: requireAuth }, async (req, reply) => {
+  app.post('/codefiles/:id/comments', async (req, reply) => {
     const { id } = req.params as { id: string }
     const parsed = commentSchema.safeParse(req.body)
     if (!parsed.success) return reply.status(400).send(fail(parsed.error.message))
@@ -42,7 +42,7 @@ export async function commentsRoutes(app: FastifyInstance): Promise<void> {
       .insert(codefileComments)
       .values({
         codefileId: id,
-        authorId: req.user!.id,
+        authorId: LOCAL_USER_ID,
         body: parsed.data.body,
         parentId: parsed.data.parentId ?? null,
       })
@@ -51,7 +51,7 @@ export async function commentsRoutes(app: FastifyInstance): Promise<void> {
     return reply.status(201).send(ok(created))
   })
 
-  app.delete('/comments/:id', { preHandler: requireAuth }, async (req, reply) => {
+  app.delete('/comments/:id', async (req, reply) => {
     const { id } = req.params as { id: string }
 
     const [comment] = await db
@@ -60,9 +60,7 @@ export async function commentsRoutes(app: FastifyInstance): Promise<void> {
       .where(eq(codefileComments.id, id))
 
     if (!comment) return reply.status(404).send(fail('Comment not found'))
-    if (comment.authorId !== req.user!.id) return reply.status(403).send(fail('Forbidden'))
 
-    // Delete child replies first
     await db.delete(codefileComments).where(eq(codefileComments.parentId, id))
     await db.delete(codefileComments).where(eq(codefileComments.id, id))
 
