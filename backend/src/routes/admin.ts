@@ -8,16 +8,20 @@ import { ok, fail } from '../lib/errors.js'
 // ── Admin auth middleware ──────────────────────────────────────────────────────
 // Protected by ADMIN_SECRET env var. Set a long random string in .env.
 // Usage: Authorization: Bearer <ADMIN_SECRET>
-async function requireAdmin(req: FastifyRequest, reply: FastifyReply): Promise<void> {
+function makeHttpError(message: string, statusCode: number): Error & { statusCode: number } {
+  const err = new Error(message) as Error & { statusCode: number }
+  err.statusCode = statusCode
+  return err
+}
+
+async function requireAdmin(req: FastifyRequest, _reply: FastifyReply): Promise<void> {
   const secret = process.env.ADMIN_SECRET
   if (!secret) {
-    reply.status(503).send(fail('Admin access not configured — set ADMIN_SECRET in .env'))
-    return
+    throw makeHttpError('Admin access not configured — set ADMIN_SECRET in .env', 503)
   }
   const auth = req.headers.authorization
   if (auth !== `Bearer ${secret}`) {
-    reply.status(401).send(fail('Unauthorized'))
-    return
+    throw makeHttpError('Unauthorized', 401)
   }
 }
 

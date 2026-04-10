@@ -65,14 +65,8 @@ vi.mock('../storage/minio.js', () => ({
   ensureBucket: vi.fn().mockResolvedValue(undefined),
 }))
 
-// Mock auth middleware — simulate logged-in user for protected routes
 vi.mock('../middleware/auth.js', () => ({
-  requireAuth: vi.fn(async (req: { user?: unknown }) => {
-    req.user = { id: 'user-1', email: 'test@example.com', name: 'Test User' }
-  }),
-  optionalAuth: vi.fn(async (req: { user?: unknown }) => {
-    req.user = { id: 'user-1', email: 'test@example.com', name: 'Test User' }
-  }),
+  LOCAL_USER_ID: 'local',
 }))
 
 const app = buildApp()
@@ -121,7 +115,7 @@ describe('POST /api/codefiles — upload validation', () => {
 })
 
 describe('POST /api/codefiles/:id/download — atomic counter regression', () => {
-  it('returns a presigned URL and does not expose raw file path', async () => {
+  it('streams file content and does not return a presigned URL', async () => {
     dbUpdateResult = [{ ...mockCodefile, downloads: 6 }]
 
     const res = await app.inject({
@@ -129,10 +123,10 @@ describe('POST /api/codefiles/:id/download — atomic counter regression', () =>
       url: `/api/codefiles/${mockCodefile.id}/download`,
     })
     expect(res.statusCode).toBe(200)
-    const body = res.json()
-    expect(body.data.url).toContain('presigned')
-    // Ensure the internal MinIO path is not leaked directly
-    expect(body.data.url).not.toContain(mockCodefile.authorId)
+    expect(res.headers['content-type']).toContain('application/octet-stream')
+    expect(res.headers['content-disposition']).toMatch(/attachment/)
+    // File content streamed from the mock downloadFile
+    expect(res.body).toBe('test')
   })
 
   it('returns 404 for unknown codefile id', async () => {
