@@ -10,7 +10,7 @@ export interface RepositoryFilters {
   sortBy: 'newest' | 'downloads' | 'rating'
 }
 
-const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
+const BASE = import.meta.env.VITE_API_URL ?? ''
 
 export function useRepository(filters: RepositoryFilters, page: number) {
   const [codefiles, setCodefiles] = useState<CodefileWithAuthor[]>([])
