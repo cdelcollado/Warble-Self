@@ -5,7 +5,7 @@ import { db } from '../db/index.js'
 import { codefiles, profiles } from '../db/schema.js'
 import { LOCAL_USER_ID } from '../middleware/auth.js'
 import { ok, fail } from '../lib/errors.js'
-import { uploadFile, deleteFile, downloadFile, getPresignedUrl } from '../storage/minio.js'
+import { uploadFile, deleteFile, downloadFile } from '../storage/minio.js'
 
 const PAGE_SIZE = 20
 
@@ -193,7 +193,7 @@ export async function codefilesRoutes(app: FastifyInstance): Promise<void> {
     return reply.send(ok(null))
   })
 
-  // ── Download (increment counter + presigned URL) ─────────────────────────────
+  // ── Download (increment counter + stream file) ───────────────────────────────
   app.post('/codefiles/:id/download', async (req, reply) => {
     const { id } = req.params as { id: string }
 
@@ -205,8 +205,12 @@ export async function codefilesRoutes(app: FastifyInstance): Promise<void> {
 
     if (!codefile) return reply.status(404).send(fail('Codefile not found'))
 
-    const url = await getPresignedUrl(codefile.filePath)
-    return reply.send(ok({ url, filename: codefile.filePath.split('/').pop() }))
+    const buffer = await downloadFile(codefile.filePath)
+    const filename = codefile.filePath.split('/').pop() ?? 'download'
+    return reply
+      .header('Content-Type', 'application/octet-stream')
+      .header('Content-Disposition', `attachment; filename="${filename}"`)
+      .send(buffer)
   })
 
   // ── Buffer (for preview) ────────────────────────────────────────────────────

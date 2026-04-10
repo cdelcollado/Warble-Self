@@ -79,18 +79,25 @@ export async function downloadCodefile(
   _filePath: string,
   fileName: string,
 ): Promise<{ error: string | null }> {
-  const { data, error } = await api<{ url: string; filename: string }>(
-    `/codefiles/${codefileId}/download`,
-    { method: 'POST' },
-  )
-  if (error || !data) return { error: error ?? 'Download failed' }
+  try {
+    const res = await fetch(`${BASE}/api/codefiles/${codefileId}/download`, {
+      method: 'POST',
+      credentials: 'include',
+    })
+    if (!res.ok) return { error: 'Download failed' }
 
-  const a = document.createElement('a')
-  a.href = data.url
-  a.download = fileName
-  a.click()
+    const blob = await res.blob()
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = fileName
+    a.click()
+    URL.revokeObjectURL(url)
 
-  return { error: null }
+    return { error: null }
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : 'Download failed' }
+  }
 }
 
 export async function fetchCodefileBuffer(
