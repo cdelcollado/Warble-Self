@@ -45,7 +45,7 @@ The Fastify backend applies `@fastify/rate-limit` globally (100 requests/minute 
 
 1. **Always backup your radio** before writing new data
 2. **Verify channel data** before writing to your radio
-3. **Use HTTPS** when deploying Warble to a public server
+3. **Use HTTPS** when deploying Warble to a public server — set `DOMAIN=your.domain.com` in `.env` and Caddy will obtain a Let's Encrypt certificate automatically. See [QUICKSTART.md](QUICKSTART.md) for Cloudflare setup
 4. **Keep your browser updated** for latest Web Serial API security patches
 5. **Never run Warble from untrusted sources**
 

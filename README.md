@@ -74,15 +74,16 @@ Available in **Catalan (CA)**, **Spanish (ES)**, and **English (EN)** — auto-d
 git clone https://github.com/cdelcollado/Warble-Self.git
 cd Warble-Self
 
-# 2. Configure secrets
-cp .env.example .env
-# Edit .env — set POSTGRES_PASSWORD, MINIO_ACCESS_KEY, MINIO_SECRET_KEY, ADMIN_SECRET
+# 2. Generate secrets and create .env automatically
+./setup.sh
 
 # 3. Build and start everything
 docker compose up --build -d
 ```
 
 Open **http://localhost** in your browser. No registration required — you're the only user.
+
+> For production with a real domain and HTTPS, edit `.env` before step 3 and set `DOMAIN`, `BETTER_AUTH_URL` and `FRONTEND_URL`. See [QUICKSTART.md](QUICKSTART.md) for SSL and Cloudflare setup.
 
 ### Option B — Local Development
 
@@ -142,7 +143,7 @@ Backend: **http://localhost:3000**
 | **Backend** | Fastify | ^5.3 | REST API server |
 | **Database** | PostgreSQL + Drizzle ORM | 16 / ^0.41 | Relational data store |
 | **Storage** | MinIO | latest | S3-compatible file storage |
-| **Proxy** | nginx | alpine | Static serving + API proxy |
+| **Proxy** | Caddy + nginx | 2-alpine / alpine | TLS termination + static serving + API proxy |
 | **Testing** | Vitest + Happy DOM | ^4.1 / ^20.8 | Unit tests |
 | **Linting** | ESLint 9 + typescript-eslint | ^9 / ^8 | Static analysis |
 
@@ -150,6 +151,9 @@ Backend: **http://localhost:3000**
 
 ```
 Browser
+  │
+  ▼
+Caddy:80/443  (automatic HTTPS via Let's Encrypt)
   │
   ▼
 nginx:80
@@ -197,8 +201,10 @@ nginx:80
 │   ├── locales/                # CA / ES / EN translations
 │   └── repository/             # Codeplug repository feature
 ├── Dockerfile                  # Frontend multi-stage build (nginx)
-├── nginx.conf                  # nginx reverse proxy config
+├── nginx.conf                  # nginx: static files + /api/* proxy to backend
+├── Caddyfile                   # Caddy: TLS termination, proxies to nginx
 ├── docker-compose.yml          # Full stack orchestration
+├── setup.sh                    # First-run script: generates .env with random secrets
 └── .env.example                # Environment variable template
 ```
 
@@ -247,25 +253,20 @@ export interface IRadioDriver {
 
 ## ⚙️ Environment Variables
 
-Copy `.env.example` to `.env` and configure:
+Run `./setup.sh` to generate `.env` automatically with random secrets. The relevant variables are:
 
-```bash
-# Database
-POSTGRES_USER=warble
-POSTGRES_PASSWORD=your_secure_password
-POSTGRES_DB=warble
+| Variable | Description | Auto-generated |
+|---|---|---|
+| `POSTGRES_PASSWORD` | PostgreSQL password | Yes |
+| `MINIO_ACCESS_KEY` | MinIO username | Yes |
+| `MINIO_SECRET_KEY` | MinIO password | Yes |
+| `BETTER_AUTH_SECRET` | Internal signing secret | Yes |
+| `ADMIN_SECRET` | Bearer token for `/api/admin/*` | Yes |
+| `DOMAIN` | Public domain for HTTPS (`localhost` for dev) | No — edit manually |
+| `BETTER_AUTH_URL` | Full URL of the app (`http://localhost` for dev) | No — edit manually |
+| `FRONTEND_URL` | Full URL of the app (`http://localhost` for dev) | No — edit manually |
 
-# MinIO (S3-compatible file storage)
-MINIO_ACCESS_KEY=your_minio_user
-MINIO_SECRET_KEY=your_minio_password
-MINIO_BUCKET=codefiles
-
-# Admin API (optional — protect /api/admin/* endpoints)
-# Generate with: openssl rand -base64 32
-ADMIN_SECRET=your_admin_secret
-```
-
-No `BETTER_AUTH_SECRET` or auth-related variables needed — there is no authentication.
+For production, set `DOMAIN`, `BETTER_AUTH_URL` and `FRONTEND_URL` to your real domain with `https://`. Caddy will obtain a Let's Encrypt certificate automatically. See [QUICKSTART.md](QUICKSTART.md) for SSL and Cloudflare setup details.
 
 ---
 

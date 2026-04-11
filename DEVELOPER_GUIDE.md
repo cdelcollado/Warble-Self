@@ -550,7 +550,13 @@ npm audit fix
 
 ### Environment Variables
 
-Copy `.env.example` to `.env` to configure:
+For Docker, use `setup.sh` to generate `.env` automatically:
+
+```bash
+./setup.sh   # creates .env with random secrets
+```
+
+For local development, copy manually:
 
 ```bash
 cp .env.example .env
