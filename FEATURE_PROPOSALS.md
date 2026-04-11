@@ -16,174 +16,15 @@ This document contains proposals for new features and improvements to existing f
 | **Data Management** | 6 | High |
 | **Performance** | 4 | Low |
 | **Advanced Features** | 7 | Medium |
-| **Community & Repository** | 6 | High |
 | **Testing & Quality** | 3 | Low |
 
-**Total**: 39 feature proposals
+**Total**: 33 feature proposals
+
+> Community and repository features (user accounts, codeplug sharing, ratings, comments) are part of **Warble Online**. See `WARBLE_ONLINE.md`.
 
 ---
 
-## 🗄️ Community Codeplug Repository
-
-> **Status**: Phases 1–4 fully implemented.
-
-The Warble Codeplug Repository is a community-driven section allowing users to share, discover and download radio codeplugs organised by brand, model, country and region. Its key differentiator over existing repositories is **in-browser channel preview** powered by Warble's own parsers — no download required to inspect a codeplug.
-
-### Architecture decision
-
-The repository is built **integrated into Warble** (not as a separate service), sharing:
-- Radio drivers and `.img`/`.csv` parsers for live channel preview
-- i18n system (CA / ES / EN)
-- Auth context
-- Existing AG Grid component for channel preview modal
-
-Backend: **Supabase** (PostgreSQL + Auth + Storage + RLS).
-
----
-
-### Phase 1 — Auth + sidebar + UI skeleton ✅ *Completed 2026-03-31*
-
-**Deliverables:**
-- `@supabase/supabase-js` installed and configured via `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`
-- `src/lib/supabase.ts` — Supabase client + `Profile` type
-- `src/auth/useAuth.ts` — hook: `signIn`, `signUp`, `signOut`, `user`, `displayName`, persistent session
-- `src/auth/AuthModal.tsx` — login/register modal with callsign field, email confirmation screen
-- `src/auth/ProfileModal.tsx` — profile editor (callsign + country), upsert to `profiles` table, save confirmation; opened by clicking the user name in the sidebar
-- `src/repository/RepositoryPage.tsx` — skeleton tab with search bar, coming-soon banner, feature preview cards
-- `src/components/Sidebar.tsx` — full sidebar navigation replacing the old horizontal tab bar
-  - Layout: logo → nav items (Memory / USB / Settings / Repository) → file actions → radio model selector → language → dark mode → auth
-  - Unsaved-changes dot indicator on Memory tab
-  - User name clickable → opens ProfileModal
-- All new strings translated in CA / ES / EN (`auth.*`, `profile.*`, `repository.*`)
-
-**Supabase schema:**
-```sql
-create table public.profiles (
-  id uuid references auth.users on delete cascade primary key,
-  callsign text,
-  country text,
-  created_at timestamp with time zone default now()
-);
-alter table public.profiles enable row level security;
-create policy "Profiles viewable by everyone" on profiles for select using (true);
-create policy "Users can insert own profile" on profiles for insert with check (auth.uid() = id);
-create policy "Users can update own profile" on profiles for update using (auth.uid() = id);
-```
-
----
-
-### Phase 2 — Upload & browse ⭐⭐⭐ ✅ *Completed 2026-04-01*
-
-**Goal**: functional read/write repository — users can upload and others can find and download.
-
-**Supabase schema additions:**
-```sql
-create table public.codefiles (
-  id uuid primary key default gen_random_uuid(),
-  author_id uuid references auth.users on delete cascade not null,
-  title text not null,
-  description text,
-  brand text not null,
-  model text not null,
-  country text not null,
-  region text,
-  file_path text not null,       -- path inside Supabase Storage bucket
-  file_format text not null,     -- 'img' | 'csv'
-  downloads integer default 0,
-  created_at timestamp with time zone default now(),
-  updated_at timestamp with time zone default now()
-);
-alter table public.codefiles enable row level security;
-create policy "Codefiles viewable by everyone" on codefiles for select using (true);
-create policy "Users can insert own codefiles" on codefiles for insert with check (auth.uid() = author_id);
-create policy "Users can update own codefiles" on codefiles for update using (auth.uid() = author_id);
-create policy "Users can delete own codefiles" on codefiles for delete using (auth.uid() = author_id);
-```
-
-**Implemented:**
-- Upload form: title, description, brand (select), model (select, filtered by brand), country, region, file (.img/.csv)
-- **Auto-detection** of radio model from `.img` file size (UV-5R: 6152 B, UV-5R MINI: 33344 B) with override option
-- File stored in Supabase Storage bucket `codefiles/`
-- Browse page: card grid with brand/model/country/region metadata, author callsign, format badge
-- Filter panel: brand → model (cascading), country (text), sort by newest/most downloaded
-- Download button increments counter via `increment_downloads` Supabase RPC
-- Pagination (20 results per page)
-- Supabase FK: `codefiles.author_id → profiles.id` for author join
-
----
-
-### Phase 3 — Channel preview ⭐⭐⭐ ✅ *Completed 2026-04-02*
-
-**Goal**: the key differentiator. Users can inspect a codeplug's channels without downloading.
-
-**Implemented:**
-- `src/repository/PreviewModal.tsx` — read-only AG Grid modal showing decoded channels
-- `src/lib/imgDetection.ts` — detects radio model from `.img` binary footer (JSON metadata embedded after EEPROM data); handles optional extra bytes between magic and base64
-- `src/lib/drivers/uv5rmini.ts` — exported standalone `decodeUV5RMini()` for use outside driver instance
-- `src/repository/useRepository.ts` — `fetchCodefileBuffer()` fetches signed URL and returns `Uint8Array` in memory
-- "Preview" button on card (only for `.img` files with a supported driver)
-- "Load into editor" copies channels into active session; silently switches driver if model already confirmed via preview
-- Driver mismatch dialog in `App.tsx` when opening a local `.img` file for a different radio model
-
-**Why this matters**: no other codeplug repository offers in-browser preview. This is only possible because Warble already has the parsers.
-
----
-
-### Phase 4 — Community & ratings ⭐⭐ ✅ *Completed 2026-04-02*
-
-**Supabase schema additions:**
-```sql
-create table public.ratings (
-  id uuid primary key default gen_random_uuid(),
-  codefile_id uuid references public.codefiles on delete cascade,
-  user_id uuid references auth.users on delete cascade,
-  score smallint check (score between 1 and 5),
-  created_at timestamp with time zone default now(),
-  unique (codefile_id, user_id)
-);
-create table public.comments (
-  id uuid primary key default gen_random_uuid(),
-  codefile_id uuid references public.codefiles on delete cascade,
-  user_id uuid references auth.users on delete cascade,
-  parent_id uuid references public.comments on delete cascade,
-  body text not null,
-  created_at timestamp with time zone default now()
-);
-create table public.reports (
-  id uuid primary key default gen_random_uuid(),
-  reporter_id uuid references auth.users on delete cascade,
-  target_type text not null,  -- 'codefile' | 'comment'
-  target_id uuid not null,
-  reason text,
-  created_at timestamp with time zone default now()
-);
--- Denormalized columns + trigger for correct pagination sort
-alter table public.codefiles add column avg_rating numeric default 0;
-alter table public.codefiles add column rating_count integer default 0;
-```
-
-**Implemented:**
-- `src/repository/CodefileDetailModal.tsx` — modal with interactive star rating (1–5), two-level threaded comments (root + replies), report dialog for codefiles and comments
-- `src/repository/useRepository.ts` — `fetchRatings`, `upsertRating`, `deleteRating`, `fetchComments`, `addComment`, `deleteComment`, `reportContent`
-- Star average + count displayed on each card; sort by best rated in filter panel
-- Anonymous users cannot download, rate, or comment (login required)
-- Full i18n coverage (CA / ES / EN) for all Phase 4 strings
-
----
-
-### Permission model
-
-| Action | Anonymous | Registered user | Author | Admin |
-|--------|-----------|-----------------|--------|-------|
-| Browse / search | ✅ | ✅ | ✅ | ✅ |
-| Download | ✅ | ✅ | ✅ | ✅ |
-| Preview channels | ✅ | ✅ | ✅ | ✅ |
-| Upload codeplug | ❌ | ✅ | ✅ | ✅ |
-| Rate / comment | ❌ | ✅ | ✅ | ✅ |
-| Edit / delete own | ❌ | ❌ | ✅ | ✅ |
-| Moderate / remove | ❌ | ❌ | ❌ | ✅ |
-
----
+> **Note:** Community and repository features (user accounts, codeplug sharing, ratings, comments, moderation) are part of **Warble Online**. See `WARBLE_ONLINE.md` for the full specification and implementation status.
 
 ---
 
@@ -1182,17 +1023,20 @@ A systematic audit of the interface identified 11 issues split into aesthetic (1
 
 ### Context
 
-Warble is a pure SPA (React → static files) with a managed Supabase backend. This determines the scope:
+Warble-Self is a **single-user, auth-free** application — no Supabase or external backend required. The deployment surface is minimal:
 
-| Deployment target | Docker needed? | Notes |
-|-------------------|---------------|-------|
-| Vercel (primary, v1.0) | No | Git-push deploy, handles statics natively |
-| Self-hosted (club server, intranet) | **Yes** | Main use case for this proposal |
-| CI builds | Optional | GitHub Actions already provides isolation |
+| Component | What it is | How it deploys |
+|-----------|-----------|----------------|
+| **Frontend** | Static SPA (`npm run build` → `dist/`) | Any static file server or CDN |
+| **RepeaterBook proxy** | Single Fastify endpoint (adds `User-Agent` header) | Docker container |
+
+The frontend alone is sufficient for all core features (USB programming, local file open/save, channel editing). The proxy is only needed if RepeaterBook import is required in production (the browser cannot set the required `User-Agent` header directly).
+
+This architecture is **platform-agnostic**: it works equally on Dokploy, Coolify, Caprover, Railway, Render, a bare VPS, or any other container host — no platform-specific primitives required.
 
 ### Proposed images
 
-**`Dockerfile`** — production (multi-stage, nginx):
+**`Dockerfile`** — production frontend (multi-stage, nginx):
 
 ```dockerfile
 FROM node:22-alpine AS build
@@ -1251,16 +1095,18 @@ server {
 
 ### Self-hosting requirements
 
-The operator must provide their own Supabase project (or a self-hosted Supabase instance) and set the environment variables:
+Warble-Self has no mandatory backend. The only optional environment variable is:
 
 ```env
-VITE_SUPABASE_URL=https://xxxx.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJ...
+# Only needed if you run the RepeaterBook proxy sidecar
+VITE_API_URL=https://your-proxy-host.example.com
 ```
+
+No database, no auth service, no third-party account required.
 
 ### Priority
 
-**Low** — the primary production target is Vercel. Useful for ham radio clubs or operators who want to run a private instance. No functional changes to the app required.
+**Medium** — primary use case is ham radio clubs or operators who want a self-contained instance on their own server. No functional changes to the app required.
 
 ---
 
