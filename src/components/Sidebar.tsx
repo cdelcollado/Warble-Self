@@ -1,4 +1,4 @@
-import { Table, Settings2, Database, FolderOpen, Save, Globe, Radio, UploadCloud, FileDown, MapPin } from 'lucide-react'
+import { Table, Settings2, Database, FolderOpen, Save, Globe, Radio, UploadCloud, FileDown, MapPin, Github } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { SUPPORTED_RADIOS } from '../lib/drivers'
 
@@ -152,6 +152,17 @@ export function Sidebar({
             <option value="ca">{t('language.ca')}</option>
           </select>
         </div>
+
+        {/* GitHub */}
+        <a
+          href="https://github.com/cdelcollado/Warble-Self"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-2.5 py-1.5 rounded-theme-md text-xs font-medium text-w-fg-faint hover:text-w-fg-soft hover:bg-w-bg-hover transition-colors"
+        >
+          <Github className="w-3.5 h-3.5 shrink-0" />
+          <span>GitHub</span>
+        </a>
       </div>
     </aside>
   )
