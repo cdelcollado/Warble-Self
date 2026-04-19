@@ -32,8 +32,16 @@ Warble is a modern, open-source web application for programming amateur (ham) ra
 > The UV-5R MINI driver implements a **reverse-engineered protocol** from the UV17Pro family, including a custom handshake and XOR encryption (`CO 7` mask).
 > The RT-4D driver was reverse-engineered from USB serial captures (SPM), supporting both read and write of the proprietary `.ddmr` flash dump format (1 MB, 115200 baud). **Verified on real hardware.**
 
+### 🏠 Homepage with Radio Showcase
+- Dedicated homepage with hero text and **rotating radio model names** (cycles every 7 seconds with fade animation)
+- Four quick-action cards: Read from radio, Open file, Import repository, Start blank
+- **Animated waveform canvas** visualization with theme-aware colors
+- Clickable logo and "Warble." name in sidebar navigates back to homepage
+
 ### 📊 Spreadsheet-style Channel Editor
 - AG Grid-powered table interface with a familiar spreadsheet view
+- **Double-click a row** to open an inline tabbed editor (Basics, Tones & Squelch, DTMF/DCS, Power & mode, Notes & Tags)
+- Frequency stepper with +/- buttons (0.0125 MHz step) in the inline editor
 - Edit channel name, frequency, duplex, offset, CTCSS/DCS tones, mode, power, and skip flag
 - Real-time **frequency validation** with colour-coded error highlighting (red = out of range for your radio)
 - Inline cell editing with instant feedback
@@ -44,11 +52,13 @@ Organise your channels into virtual zones (groups of 32 channels) for easier nav
 - Ideal for separating repeaters by region, activity type (PMR, VHF, UHF), etc.
 - Transparent to the radio: zones are a UI-only concept in Warble
 
-### 📡 RepeaterBook Integration
+### 📡 RepeaterBook with Interactive Map
 - Search and import amateur repeaters from **[RepeaterBook](https://repeaterbook.com/)** directly into your channel list
+- **Interactive Leaflet map** with repeater markers and popups — split-panel layout (search panel + map)
 - Filter by country, region/state, and frequency band (VHF / UHF / ALL)
+- **Radius slider** (5–500 km) with live filtering; sort by distance or frequency
+- Expandable repeater detail cards with callsign, city, frequency, PL, distance
 - **Smart hardware filter:** only repeaters compatible with your selected radio model are imported
-- Optional proximity sort: enter your GPS coordinates to sort repeaters by distance
 
 ### 🚨 PMR446 Quick-add
 - One-click insertion of all 16 standard **PMR446** channels (446.00625–446.19375 MHz)
@@ -67,7 +77,11 @@ Organise your channels into virtual zones (groups of 32 channels) for easier nav
 - View and edit global radio parameters (VOX, squelch, backlight, etc.) via a dedicated settings panel
 - Settings schema is driver-specific: each radio model defines its own editable fields
 
----
+### 🎨 Blueprint Theme
+- Custom design system with **semantic CSS tokens** (`--w-bg`, `--w-fg`, `--w-accent`, `--w-border`, `--sig-*`)
+- Sepia/cream color palette with red accent and sharp corners
+- Breadcrumb navigation bar showing radio model, codeplug status, and save state
+- Bottom status bar with channel count and frequency limits
 
 ---
 
@@ -185,7 +199,8 @@ This section describes the full technical architecture of Warble: the technology
 | **Language** | TypeScript | ~5.9 | Strict typing throughout the entire codebase |
 | **UI Framework** | React | ^19.2 | Component-based declarative UI |
 | **Build Tool** | Vite | ^5.4 | Dev server (HMR), ESM-native production bundler |
-| **Styling** | Tailwind CSS | ^3.4 | Utility-first CSS, dark mode via `class` strategy |
+| **Styling** | Tailwind CSS | ^3.4 | Utility-first CSS with semantic design tokens |
+| **Maps** | Leaflet + react-leaflet | ^1.9 / ^5 | Interactive RepeaterBook map |
 | **Grid** | AG Grid Community | ^35.1 | High-performance spreadsheet-style channel editor |
 | **Icons** | Lucide React | ^0.575 | SVG icon library, tree-shakeable |
 | **Toasts** | react-hot-toast | ^2.6 | Non-blocking in-app notifications |
@@ -209,10 +224,15 @@ src/
 ├── App.tsx                     # Root component — routing, file open/save, driver switching
 ├── components/
 │   ├── MemoryGrid.tsx          # AG Grid channel editor with inline editing & validation
+│   ├── ChannelDetail.tsx       # Inline tabbed channel editor (double-click a row)
+│   ├── LandingPage.tsx         # Homepage with rotating radio showcase + action cards
+│   ├── RepeaterBookPage.tsx    # RepeaterBook with interactive Leaflet map
+│   ├── Waveform.tsx            # Animated waveform canvas component
 │   ├── GlobalSettings.tsx      # Driver-specific global settings panel (schema-driven)
-│   ├── RadioProgrammer.tsx     # USB read/write UI with progress bar
-│   └── Sidebar.tsx             # Left navigation: tabs, file actions, driver selector
+│   ├── RadioProgrammer.tsx     # USB read/write UI (slide-in drawer)
+│   └── Sidebar.tsx             # Left navigation with clickable logo: tabs, file actions, driver selector
 ├── hooks/
+│   ├── useTheme.ts             # Blueprint theme hook (applies data-theme attribute)
 │   ├── useToast.ts             # Wrapper around react-hot-toast
 │   └── useFrequencyValidation.ts # Frequency validation against driver limits
 ├── lib/
@@ -224,7 +244,7 @@ src/
 │   ├── binary.ts               # Low-level binary utilities (BCD, uint, buffer helpers)
 │   ├── imgDetection.ts         # Auto-detect radio model from .img footer / .ddmr magic
 │   ├── pmr.ts                  # PMR446 channel table (16 channels, 446 MHz)
-│   ├── repeaterbook.ts         # RepeaterBook API integration (search + import)
+│   ├── repeaterbook.ts         # RepeaterBook API (search, raw fetch, channel conversion)
 │   ├── security.ts             # File validation, XSS sanitization, CSV injection prevention
 │   ├── serial.ts               # Web Serial API wrapper (connect, read, write, buffers)
 │   └── types.ts                # Core TypeScript interfaces: MemoryChannel, IRadioDriver, etc.

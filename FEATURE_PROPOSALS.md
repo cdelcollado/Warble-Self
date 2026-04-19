@@ -2,7 +2,7 @@
 
 This document contains proposals for new features and improvements to existing functionality in the Warble application.
 
-**Date**: 2025-03-28 (updated 2026-04-02, RT-4D added)
+**Date**: 2025-03-28 (updated 2026-04-19, UI redesign completed)
 **Status**: Proposed for future implementation
 
 ---
@@ -931,33 +931,34 @@ test('import .img file and export CSV', async ({ page }) => {
 
 ## 🎯 Implementation Roadmap
 
-### Phase 1: Quick Wins (1-2 months)
-1. ✅ Undo/Redo system
-2. ✅ Channel templates
-3. ✅ Advanced search
-4. ✅ Bulk edit operations
-5. ✅ PWA conversion
+### Completed (2026-04-19)
+- ✅ Bulk edit operations (power, mode, tone, duplex dropdowns in toolbar)
+- ✅ Theme system (Blueprint theme with semantic CSS tokens)
+- ✅ RepeaterBook enhanced filters (interactive map, radius slider, distance/freq sort)
+- ✅ Channel inline editing (tabbed detail panel with double-click)
+- ✅ Homepage with radio showcase (rotating model names, action cards)
+- ✅ Auto-detect radio model from `.img` footer
 
-### Phase 2: Radio Support (2-3 months)
-6. ✅ Add 3-5 new radio models
-7. ✅ Auto-detect radio
-8. ✅ Firmware version check
+### Phase 1: Quick Wins (next)
+1. Undo/Redo system
+2. Channel templates (Maritime VHF, Aviation, Weather, PMR, GMRS, FRS)
+3. Advanced search & filter
+4. PWA conversion
 
-### Phase 3: Data Management (1-2 months)
-9. ✅ Multi-format export (JSON, Excel, ADIF)
-10. ✅ Channel notes/comments
-11. ✅ Drag-and-drop reordering
+### Phase 2: Radio Support
+5. Add 3-5 new radio models (Quansheng UV-K5, AnyTone, Retevis)
+6. Firmware version check
 
-### Phase 4: Advanced Features (3-4 months)
-12. ✅ Zone management
-13. ✅ Conflict detector
-14. ✅ RepeaterBook enhanced filters
-15. ✅ Theme customization
+### Phase 3: Data Management
+7. Multi-format export (JSON, Excel, ADIF)
+8. Channel notes/comments
+9. Drag-and-drop reordering
 
-### Phase 5: Testing & Polish (1 month)
-16. ✅ E2E tests
-17. ✅ Accessibility audit
-18. ✅ Performance optimizations
+### Phase 4: Advanced Features
+10. Zone management UI
+11. Conflict detector
+12. E2E tests (Playwright)
+13. Accessibility audit (WCAG AA)
 
 ---
 

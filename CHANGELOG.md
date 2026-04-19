@@ -7,6 +7,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **UI redesign — Blueprint theme** (2026-04-19)
+  - Consolidated to a single **Blueprint** theme (sepia/cream tones, red accent, sharp corners) — removed Refined and Instrument themes
+  - CSS custom properties design system with semantic tokens (`--w-bg`, `--w-fg`, `--w-accent`, `--w-border`, `--sig-*`)
+  - Tailwind extended with custom token colors (`w.*`, `sig.*`) and theme-aware border radii (`rounded-theme-*`)
+  - `src/hooks/useTheme.ts` — simplified to Blueprint-only hook
+
+- **Homepage** (2026-04-19)
+  - New dedicated homepage accessible via the `home` tab (default on app load)
+  - Hero text with **rotating radio model names** — cycles through all supported radios every 7 seconds with fade animation
+  - Four action cards: Read from radio, Open file, Import repository, Start blank
+  - Format pills (USB, .IMG, .CSV, .DDMR)
+  - Animated **waveform canvas** visualization on the right side (theme-aware colors via CSS variables)
+  - Clickable logo and "Warble." name in sidebar navigates back to homepage
+
+- **Inline channel editing** (2026-04-19)
+  - `src/components/ChannelDetail.tsx` — tabbed inline editor triggered by double-clicking a channel row
+  - 5 tabs: Basics, Tones & Squelch, DTMF/DCS, Power & mode, Notes & Tags
+  - Frequency stepper with +/- buttons (0.0125 MHz step)
+  - Draft state pattern: edits are local until Save/Discard
+
+- **Enhanced RepeaterBook with interactive map** (2026-04-19)
+  - `src/components/RepeaterBookPage.tsx` — split-panel layout (420px search panel + Leaflet map)
+  - Interactive map with OpenStreetMap tiles, repeater markers, and popups
+  - Search by country, state, band; radius slider (5–500km) with live filtering
+  - Sort toggle: distance vs frequency
+  - Expandable repeater detail cards with callsign, city, frequency, PL, distance
+  - `src/lib/repeaterbook.ts` — added `fetchRepeaterBookRaw()` and `repeaterToChannel()` for raw repeater data
+  - Dependencies added: `leaflet`, `react-leaflet`, `@types/leaflet`
+
+- **Breadcrumb bar** (2026-04-19)
+  - Top bar showing: Ready status > Radio model > codeplug > untitled/filename > saved/unsaved indicator
+  - Connect radio button on the right side
+
+- **Bottom status bar** (2026-04-19)
+  - Persistent footer showing channel count, frequency limits, and save status
+
+### Changed
+- **Sidebar restyled** (2026-04-19)
+  - Logo and "Warble." name are now a clickable button navigating to homepage
+  - "Select radio" label added above radio model dropdown
+  - Navigation items renamed: Channels, Radio settings, RepeaterBook, Codeplug repository
+  - File actions hidden on homepage and repository tabs
+  - All sections use `shrink-0` to prevent flex compression
+
+- **MemoryGrid toolbar compacted** (2026-04-19)
+  - Zone tabs promoted to top as proper tab-style buttons with active border indicator
+  - Smaller padding, icons, and dividers throughout
+  - AG Grid: `rowHeight=32`, `headerHeight=34`, LOC column `width=60`
+
 ### Changed
 - **Auth-free single-user mode** (2026-04-11) — Warble-Self is now a no-login application designed for personal self-hosted use
   - Removed Better Auth, all auth middleware, login/register UI, and password-reset flow entirely

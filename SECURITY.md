@@ -18,7 +18,7 @@ If you discover a security vulnerability within Warble, please send an email to 
 ### Input Validation
 
 - **File Size Limits**: Uploaded files are limited to 10MB to prevent memory exhaustion
-- **File Type Validation**: Only `.img` and `.csv` files are accepted
+- **File Type Validation**: Only `.img`, `.csv`, and `.ddmr` files are accepted
 - **Buffer Validation**: Binary buffers are validated for corruption before processing
 - **Frequency Validation**: All frequency inputs are validated against hardware limits
 

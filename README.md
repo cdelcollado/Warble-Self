@@ -29,17 +29,27 @@ Warble is a modern, open-source web application for programming amateur (ham) ra
 | **Baofeng UV-5R MINI** | 999 | FM analog | UV17Pro (XOR-encrypted) |
 | **Radtel RT-4D** | 3072 | FM + **DMR** | Proprietary (reverse-engineered) |
 
+### 🏠 Homepage with Radio Showcase
+- Dedicated homepage with rotating radio model names (cycles every 7 seconds)
+- Four quick-action cards: Read from radio, Open file, Import repository, Start blank
+- Animated waveform canvas visualization
+- Clickable logo navigates back to homepage from any tab
+
 ### 📊 Spreadsheet-style Channel Editor
 - AG Grid-powered table with inline editing
+- **Double-click a row** to open an inline tabbed editor (Basics, Tones, DTMF, Power, Notes)
 - Real-time frequency validation with colour-coded highlighting
 - Edit channel name, frequency, duplex, offset, CTCSS/DCS tones, mode, power, skip
 
 ### 🗂️ Virtual Zones
 Organise channels into virtual zones (groups of 32) for easier navigation — transparent to the radio.
 
-### 📡 RepeaterBook Integration
+### 📡 RepeaterBook with Interactive Map
 - Search and import repeaters from **[RepeaterBook](https://repeaterbook.com/)** directly into your channel list
-- Filter by country, region, band; sort by proximity
+- **Interactive Leaflet map** with repeater markers and popups
+- Split-panel layout: search/list on the left, map on the right
+- Filter by country, region, band; radius slider (5–500km); sort by distance or frequency
+- Expandable repeater detail cards with callsign, city, frequency, PL, distance
 
 ### 🚨 PMR446 Quick-add
 One-click insertion of all 16 standard PMR446 channels.
@@ -136,7 +146,8 @@ Backend: **http://localhost:3000**
 | **Language** | TypeScript | ~5.9 | Strict typing throughout |
 | **UI Framework** | React | ^19.2 | Component-based UI |
 | **Build Tool** | Vite | ^5.4 | Dev server + production bundler |
-| **Styling** | Tailwind CSS | ^3.4 | Utility-first, dark mode |
+| **Styling** | Tailwind CSS | ^3.4 | Utility-first with semantic design tokens |
+| **Maps** | Leaflet + react-leaflet | ^1.9 / ^5 | Interactive RepeaterBook map |
 | **Grid** | AG Grid Community | ^35.1 | Spreadsheet-style channel editor |
 | **Icons** | Lucide React | ^0.575 | SVG icon library |
 | **i18n** | i18next + react-i18next | ^25 / ^16 | CA / ES / EN runtime translations |
@@ -190,12 +201,19 @@ nginx:80
 │   ├── App.tsx
 │   ├── components/
 │   │   ├── MemoryGrid.tsx      # AG Grid channel editor
+│   │   ├── ChannelDetail.tsx   # Inline tabbed channel editor (double-click)
+│   │   ├── LandingPage.tsx     # Homepage with radio showcase + action cards
+│   │   ├── RepeaterBookPage.tsx # RepeaterBook with interactive Leaflet map
+│   │   ├── Waveform.tsx        # Animated waveform canvas component
 │   │   ├── GlobalSettings.tsx  # Driver-specific settings panel
-│   │   ├── RadioProgrammer.tsx # USB read/write UI
-│   │   └── Sidebar.tsx         # Navigation sidebar
+│   │   ├── RadioProgrammer.tsx # USB read/write UI (slide-in drawer)
+│   │   └── Sidebar.tsx         # Navigation sidebar with clickable logo
+│   ├── hooks/
+│   │   └── useTheme.ts         # Blueprint theme hook
 │   ├── lib/
 │   │   ├── api.ts              # HTTP client (api, authApi, apiBuffer)
 │   │   ├── drivers/            # Radio driver implementations
+│   │   ├── repeaterbook.ts     # RepeaterBook API (search, raw fetch, channel conversion)
 │   │   ├── supabase.ts         # TypeScript types + RADIO_BRANDS catalogue
 │   │   └── types.ts            # Core interfaces
 │   ├── locales/                # CA / ES / EN translations
@@ -293,6 +311,7 @@ npm run test:coverage # coverage report
 | Self-hosted backend | Fastify + Better Auth + MinIO | ✅ 2026-04-07 |
 | Full Docker stack | Single `docker compose up` deployment | ✅ 2026-04-07 |
 | Auth-free single-user mode | Removed login/register, local user auto-seeded | ✅ 2026-04-11 |
+| UI redesign | Blueprint theme, homepage, inline editing, RepeaterBook map | ✅ 2026-04-19 |
 
 **Upcoming:**
 - PWA support

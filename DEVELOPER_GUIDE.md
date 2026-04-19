@@ -15,6 +15,21 @@ This guide explains how to use the new utilities and improvements implemented in
 
 ## 🎨 UI Design System
 
+### Blueprint Theme
+
+Warble uses the **Blueprint** theme — sepia/cream tones with a red accent and sharp corners. The theme is applied via `data-theme="blueprint"` on `<html>` and managed by `src/hooks/useTheme.ts`.
+
+All colors are semantic CSS custom properties defined in `src/index.css`. Use the Tailwind token classes (e.g., `bg-w-bg`, `text-w-fg`, `border-w-border`) instead of raw color values.
+
+```typescript
+import { useTheme } from './hooks/useTheme';
+
+function App() {
+  const { theme, isDark } = useTheme(); // theme = 'blueprint', isDark = false
+  // Theme is automatically applied to document.documentElement
+}
+```
+
 ### Button Component
 
 All interactive buttons must use `src/components/ui/Button.tsx`. Never use raw `<button>` elements in new code.
@@ -75,15 +90,20 @@ setShowConnectionPanel(true)
 
 When radio data is loaded successfully, the drawer auto-closes.
 
-### Radio Status Bar
+### Breadcrumb Bar
 
-A persistent bar above the main content area (hidden on the Repository tab) shows:
+A persistent bar above the main content area shows:
+- Ready status indicator (green dot when buffer loaded)
 - Active radio model name
-- File loaded / No file badge
-- Unsaved changes badge (amber)
-- USB connection button (opens the connection drawer)
+- Codeplug > filename > saved/unsaved indicator
+- Connect radio button (opens the connection drawer)
 
-It uses CSS variables `--toast-bg` / `--toast-text` defined in `src/index.css` for dark mode compatibility.
+### Bottom Status Bar
+
+A persistent footer showing:
+- Channel count / max capacity
+- Frequency limits for the selected radio
+- Save status (unsaved/saved)
 
 ### Frequency Validation UX
 
@@ -601,4 +621,4 @@ const maxSize = import.meta.env.VITE_MAX_FILE_SIZE_MB;
 
 ---
 
-**Last updated**: 2026-04-11
+**Last updated**: 2026-04-19
