@@ -17,28 +17,28 @@ const base =
 
 const variants: Record<Variant, string> = {
   primary:
-    'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white ' +
+    'bg-w-accent hover:brightness-110 active:brightness-90 text-white ' +
     'shadow-sm hover:shadow-md active:scale-[0.98]',
   secondary:
-    'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 ' +
-    'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 ' +
+    'bg-w-bg-elev border border-w-border ' +
+    'text-w-fg-soft hover:bg-w-bg-hover ' +
     'shadow-sm active:scale-[0.98]',
   outline:
-    'bg-transparent border-2 border-slate-800 dark:border-slate-500 ' +
-    'text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 ' +
+    'bg-transparent border-2 border-w-border-strong ' +
+    'text-w-fg hover:bg-w-bg-hover ' +
     'active:scale-[0.98]',
   ghost:
-    'text-slate-600 dark:text-slate-400 ' +
-    'hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-200',
+    'text-w-fg-soft ' +
+    'hover:bg-w-bg-hover hover:text-w-fg',
   destructive:
-    'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white ' +
+    'bg-sig-red hover:brightness-110 active:brightness-90 text-white ' +
     'shadow-sm hover:shadow-md active:scale-[0.98]',
 }
 
 const sizes: Record<Size, string> = {
-  sm: 'px-3 py-2 text-xs rounded-lg',
-  md: 'px-4 py-2.5 text-sm rounded-xl',
-  lg: 'px-5 py-3.5 text-sm rounded-xl',
+  sm: 'px-3 py-2 text-xs rounded-theme-md',
+  md: 'px-4 py-2.5 text-sm rounded-theme-lg',
+  lg: 'px-5 py-3.5 text-sm rounded-theme-lg',
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({

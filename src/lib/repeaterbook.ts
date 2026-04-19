@@ -34,6 +34,103 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   return R * c;
 }
 
+export interface RepeaterResult {
+  callsign: string;
+  city: string;
+  frequency: number;
+  inputFreq: number;
+  pl: string;
+  tsq: string;
+  lat: number;
+  lon: number;
+  region: string;
+  state: string;
+  use: string;
+  status: string;
+  distance?: number;
+}
+
+export async function fetchRepeaterBookRaw(
+  country: string,
+  state: string,
+  band: 'ALL' | 'VHF' | 'UHF' = 'ALL',
+  userLat?: number,
+  userLon?: number
+): Promise<RepeaterResult[]> {
+  const url = country === 'United States' || country === 'Canada' || country === 'Mexico'
+    ? `/api/repeater/export.php?country=${encodeURIComponent(country)}&state=${encodeURIComponent(state)}`
+    : `/api/repeater/exportROW.php?country=${encodeURIComponent(country)}&state=${encodeURIComponent(state)}`;
+
+  const response = await fetch(url);
+  if (!response.ok) throw new Error("Error connecting to the RepeaterBook server");
+
+  const data = await response.json();
+  if (!data.results || data.count === 0) return [];
+
+  const results: RepeaterResult[] = data.results
+    .filter((r: RepeaterBookRecord) => {
+      if (r["Operational Status"] !== "On-air" || r["Use"] !== "OPEN") return false;
+      if (band === 'ALL') return true;
+      const freq = parseFloat(r["Frequency"]);
+      if (band === 'VHF' && freq >= 136 && freq <= 174) return true;
+      if (band === 'UHF' && freq >= 400 && freq <= 520) return true;
+      return false;
+    })
+    .map((r: RepeaterBookRecord) => ({
+      callsign: r["Callsign"] || '',
+      city: r["Nearest City"] || '',
+      frequency: parseFloat(r["Frequency"]),
+      inputFreq: parseFloat(r["Input Freq"]),
+      pl: r["PL"] || '',
+      tsq: r["TSQ"] || '',
+      lat: parseFloat(r["Lat"]) || 0,
+      lon: parseFloat(r["Long"]) || 0,
+      region: r["Region"] || '',
+      state: r["State"] || '',
+      use: r["Use"] || '',
+      status: r["Operational Status"] || '',
+      distance: (userLat !== undefined && userLon !== undefined && parseFloat(r["Lat"]) && parseFloat(r["Long"]))
+        ? calculateDistance(userLat, userLon, parseFloat(r["Lat"]), parseFloat(r["Long"]))
+        : undefined,
+    }));
+
+  if (userLat !== undefined && userLon !== undefined) {
+    results.sort((a, b) => (a.distance ?? 999999) - (b.distance ?? 999999));
+  }
+
+  return results;
+}
+
+export function repeaterToChannel(r: RepeaterResult): MemoryChannel {
+  let duplex: 'None' | '+' | '-' = 'None';
+  let offset = "0.000000";
+  if (r.inputFreq > 0 && r.inputFreq !== r.frequency) {
+    if (r.inputFreq > r.frequency) {
+      duplex = '+';
+      offset = (r.inputFreq - r.frequency).toFixed(6);
+    } else {
+      duplex = '-';
+      offset = (r.frequency - r.inputFreq).toFixed(6);
+    }
+  }
+
+  let toneMode: 'None' | 'Tone' | 'TSQL' = 'None';
+  let tone = "88.5";
+  let toneSql = "88.5";
+  if (r.pl && parseFloat(r.pl)) { toneMode = 'Tone'; tone = parseFloat(r.pl).toFixed(1); }
+  if (r.tsq && parseFloat(r.tsq)) { toneMode = 'TSQL'; toneSql = parseFloat(r.tsq).toFixed(1); }
+
+  return {
+    index: 0,
+    name: (r.callsign || r.city).substring(0, 7),
+    frequency: r.frequency.toFixed(6),
+    duplex, offset, toneMode, tone, toneSql,
+    dtcsCode: "023", rxDtcsCode: "023", dtcsPolarity: "NN",
+    mode: "FM", power: "High", skip: false,
+    distance: r.distance,
+  } as any;
+}
+
 export async function fetchRepeaterBook(
   country: string, 
   state: string, 

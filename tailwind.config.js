@@ -8,9 +8,37 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['"Inter Tight"', 'Inter', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        display: ['"Inter Tight"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       colors: {
+        // Theme-aware semantic tokens
+        w: {
+          bg:           'var(--w-bg)',
+          'bg-elev':    'var(--w-bg-elev)',
+          'bg-sunken':  'var(--w-bg-sunken)',
+          'bg-hover':   'var(--w-bg-hover)',
+          fg:           'var(--w-fg)',
+          'fg-soft':    'var(--w-fg-soft)',
+          'fg-mute':    'var(--w-fg-mute)',
+          'fg-faint':   'var(--w-fg-faint)',
+          border:       'var(--w-border)',
+          'border-soft':'var(--w-border-soft)',
+          'border-strong':'var(--w-border-strong)',
+          accent:       'var(--w-accent)',
+          'accent-soft':'var(--w-accent-soft)',
+          'accent-fg':  'var(--w-accent-fg)',
+          'accent-strong':'var(--w-accent-strong)',
+        },
+        sig: {
+          green:  'var(--sig-green)',
+          amber:  'var(--sig-amber)',
+          red:    'var(--sig-red)',
+          cyan:   'var(--sig-cyan)',
+          violet: 'var(--sig-violet)',
+        },
+        // Existing shadcn tokens
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -49,9 +77,15 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        'theme-sm': 'var(--rad-sm)',
+        'theme-md': 'var(--rad-md)',
+        'theme-lg': 'var(--rad-lg)',
+        'theme-xl': 'var(--rad-xl)',
+      },
+      boxShadow: {
+        'card': 'var(--card-shadow)',
       },
     },
   },
   plugins: [],
 }
-

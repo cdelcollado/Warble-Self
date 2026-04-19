@@ -12,6 +12,7 @@ import { getPmr446Channels } from '../lib/pmr';
 import { Copy, Trash2, Plus, Eraser, Globe, X, Loader2, Radio, ListX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '../hooks/useToast';
+import { ChannelDetail } from './ChannelDetail';
 
 export function MemoryGrid({
   data = defaultChannels,
@@ -36,6 +37,7 @@ export function MemoryGrid({
   const [isRbLoading, setIsRbLoading] = useState(false);
   const [userCoords, setUserCoords] = useState<{lat: number, lon: number} | null>(null);
   const [clearAllPending, setClearAllPending] = useState(false);
+  const [expandedChannel, setExpandedChannel] = useState<MemoryChannel | null>(null);
   const gridRef = useRef<AgGridReact>(null);
 
   useEffect(() => {
@@ -318,7 +320,7 @@ export function MemoryGrid({
 
   // Columnes del grid de memòria
   const columnDefs = useMemo(() => [
-    { field: 'index', headerName: t('grid.columns.loc'), width: 70, pinned: 'left', editable: false },
+    { field: 'index', headerName: t('grid.columns.loc'), width: 60, pinned: 'left', editable: false },
     { 
       field: 'frequency', 
       headerName: t('grid.columns.frequency'), 
@@ -352,7 +354,7 @@ export function MemoryGrid({
         return false;
       },
       cellClassRules: {
-        'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400': (params: any) => {
+        'bg-[color-mix(in_srgb,var(--sig-red)_10%,var(--w-bg-elev))] text-sig-red': (params: any) => {
            if (!params.value || params.value.trim() === '') return false;
            const freq = parseFloat(params.value);
            if (isNaN(freq)) return true;
@@ -443,168 +445,127 @@ export function MemoryGrid({
   }), []);
 
   return (
-    <div className="flex flex-col h-full w-full bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors duration-300">
-      {/* Toolbar superior */}
-      <div className="flex flex-col border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
-        <div className="flex items-center justify-between p-3 border-b border-slate-200 dark:border-slate-800">
-          <div className="flex items-center gap-2">
-          {/* Grup 1: Portapapers */}
-          <button
-            onClick={handlePasteFromClipboard}
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-          >
-            <Copy className="w-4 h-4" />
-            {t('grid.buttons.paste')}
-          </button>
-
-          <div className="h-5 w-px bg-slate-200 dark:bg-slate-700 mx-1" />
-
-          {/* Grup 2: Afegir canals */}
-          <button
-            onClick={handleAddChannel}
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-900/50 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            {t('grid.buttons.add')}
-          </button>
-          <button
-            onClick={() => setRbModalOpen(true)}
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-900/50 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
-          >
-            <Globe className="w-4 h-4" />
-            {t('grid.buttons.repeaterbook')}
-          </button>
-          <button
-            onClick={handleAddPMR}
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-900/50 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
-          >
-            <Radio className="w-4 h-4" />
-            {t('grid.buttons.addPmr')}
-          </button>
-
-          <div className="h-5 w-px bg-slate-200 dark:bg-slate-700 mx-1" />
-
-          {/* Grup 3: Esborrar */}
-          <button
-            onClick={handleClearSelected}
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-900/50 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
-          >
-            <Eraser className="w-4 h-4" />
-            {t('grid.buttons.clear')}
-          </button>
-          <button
-            onClick={handleDeleteSelected}
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-900/50 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
-          >
-            <Trash2 className="w-4 h-4" />
-            {t('grid.buttons.delete')}
-          </button>
-
-          <div className="h-5 w-px bg-slate-200 dark:bg-slate-700 mx-1" />
-
-          <button
-            onClick={handleClearAll}
-            onBlur={() => setClearAllPending(false)}
-            aria-pressed={clearAllPending}
-            aria-label={clearAllPending ? t('grid.alerts.confirmClearAllShort', { count: rowData.length }) : t('grid.buttons.clearAll')}
-            className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
-              clearAllPending
-                ? 'bg-red-600 text-white border-red-700 hover:bg-red-700 font-bold'
-                : 'text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/40 border-red-300 dark:border-red-900/70 hover:bg-red-200 dark:hover:bg-red-900/80'
-            }`}
-          >
-            <ListX className="w-4 h-4" />
-            {clearAllPending ? t('grid.alerts.confirmClearAllShort', { count: rowData.length }) : t('grid.buttons.clearAll')}
-          </button>
-          
-          {/* Bulk Edit Options (visible when more than one channel is selected) */}
-          {selectedCount > 1 && (
-             <div className="flex items-center gap-2 ml-4 pl-4 border-l border-slate-300 dark:border-slate-700 animate-in fade-in slide-in-from-left-4 duration-300">
-               <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest">{selectedCount} SELECT.</span>
-               <select
-                 className="text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border-none rounded shadow-sm py-1 px-2 focus:ring-2 focus:ring-blue-500 cursor-pointer"
-                 onChange={(e) => { if(e.target.value) { handleBulkEdit('power', e.target.value); e.target.value = ''; } }}
-                 defaultValue=""
-               >
-                 <option value="" disabled>{t('grid.bulkEdit.power')}</option>
-                 <option value="High">High</option>
-                 <option value="Low">Low</option>
-               </select>
-
-               <select
-                 className="text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border-none rounded shadow-sm py-1 px-2 focus:ring-2 focus:ring-blue-500 cursor-pointer"
-                 onChange={(e) => { if(e.target.value) { handleBulkEdit('mode', e.target.value); e.target.value = ''; } }}
-                 defaultValue=""
-               >
-                 <option value="" disabled>{t('grid.bulkEdit.mode')}</option>
-                 <option value="FM">FM</option>
-                 <option value="NFM">NFM</option>
-                 <option value="AM">AM</option>
-               </select>
-
-               <select
-                 className="text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border-none rounded shadow-sm py-1 px-2 focus:ring-2 focus:ring-blue-500 cursor-pointer"
-                 onChange={(e) => { if(e.target.value) { handleBulkEdit('toneMode', e.target.value); e.target.value = ''; } }}
-                 defaultValue=""
-               >
-                 <option value="" disabled>{t('grid.bulkEdit.toneMode')}</option>
-                 <option value="None">None</option>
-                 <option value="Tone">Tone</option>
-                 <option value="TSQL">TSQL</option>
-                 <option value="DTCS">DTCS</option>
-                 <option value="Cross">Cross</option>
-               </select>
-
-               <select
-                 className="text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border-none rounded shadow-sm py-1 px-2 focus:ring-2 focus:ring-blue-500 cursor-pointer"
-                 onChange={(e) => { if(e.target.value) { handleBulkEdit('duplex', e.target.value); e.target.value = ''; } }}
-                 defaultValue=""
-               >
-                 <option value="" disabled>{t('grid.bulkEdit.duplex')}</option>
-                 <option value="None">None</option>
-                 <option value="+">+</option>
-                 <option value="-">-</option>
-                 <option value="Split">Split</option>
-               </select>
-             </div>
-          )}
+    <div className="flex flex-col h-full w-full bg-w-bg-elev overflow-hidden transition-colors duration-300">
+      {/* Zone tabs — top level */}
+      {channelCount > 32 && (
+        <div className="flex items-center gap-0 border-b border-w-border bg-w-bg-elev shrink-0 overflow-x-auto scrollbar-hide">
+          {[
+            { id: 0, key: 'all' },
+            { id: 1, key: 'z1' },
+            { id: 2, key: 'z2' },
+            { id: 3, key: 'z3' },
+            { id: 4, key: 'z4' }
+          ].map(zone => (
+            <button
+              key={zone.id}
+              onClick={() => handleZoneChange(zone.id)}
+              className={`px-4 py-2 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap ${
+                activeZone === zone.id
+                  ? 'border-w-accent text-w-accent-fg bg-w-bg-elev'
+                  : 'border-transparent text-w-fg-mute hover:text-w-fg-soft hover:bg-w-bg-hover'
+              }`}
+            >
+              {t(`grid.zones.${zone.key}`)}
+            </button>
+          ))}
         </div>
-        </div>
-        
-        {/* Zone selector — only shown if the model supports more than 32 channels */}
-        {channelCount > 32 && <div className="flex items-center gap-2 px-4 py-2 bg-slate-100/30 dark:bg-slate-900/30 overflow-x-auto scrollbar-hide">
-           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mr-2">{t('grid.zones.title')}</span>
-           
-           {[
-             { id: 0, key: 'all' },
-             { id: 1, key: 'z1' },
-             { id: 2, key: 'z2' },
-             { id: 3, key: 'z3' },
-             { id: 4, key: 'z4' }
-           ].map(zone => (
-             <button
-               key={zone.id}
-               onClick={() => handleZoneChange(zone.id)}
-               className={`px-3 py-2 text-xs font-bold rounded-full border transition-all ${
-                 activeZone === zone.id 
-                   ? 'bg-blue-600 text-white border-blue-600 shadow-sm' 
-                   : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700'
-               }`}
-             >
-               {t(`grid.zones.${zone.key}`)}
-             </button>
-           ))}
-        </div>}
+      )}
+
+      {/* Compact toolbar */}
+      <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-w-border bg-w-bg-sunken shrink-0 overflow-x-auto scrollbar-hide transition-colors duration-300">
+        <button onClick={handlePasteFromClipboard} title={t('grid.buttons.paste')}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-w-fg-soft bg-w-bg-elev border border-w-border rounded-theme-md hover:bg-w-bg-hover transition-colors">
+          <Copy className="w-3.5 h-3.5" /> {t('grid.buttons.paste')}
+        </button>
+
+        <div className="h-4 w-px bg-w-border mx-0.5 shrink-0" />
+
+        <button onClick={handleAddChannel} title={t('grid.buttons.add')}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-sig-green bg-w-bg-elev border border-w-border rounded-theme-md hover:bg-w-bg-hover transition-colors">
+          <Plus className="w-3.5 h-3.5" /> {t('grid.buttons.add')}
+        </button>
+        <button onClick={() => setRbModalOpen(true)} title={t('grid.buttons.repeaterbook')}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-sig-green bg-w-bg-elev border border-w-border rounded-theme-md hover:bg-w-bg-hover transition-colors">
+          <Globe className="w-3.5 h-3.5" /> {t('grid.buttons.repeaterbook')}
+        </button>
+        <button onClick={handleAddPMR} title={t('grid.buttons.addPmr')}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-sig-green bg-w-bg-elev border border-w-border rounded-theme-md hover:bg-w-bg-hover transition-colors">
+          <Radio className="w-3.5 h-3.5" /> {t('grid.buttons.addPmr')}
+        </button>
+
+        <div className="h-4 w-px bg-w-border mx-0.5 shrink-0" />
+
+        <button onClick={handleClearSelected} title={t('grid.buttons.clear')}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-sig-amber bg-w-bg-elev border border-w-border rounded-theme-md hover:bg-w-bg-hover transition-colors">
+          <Eraser className="w-3.5 h-3.5" /> {t('grid.buttons.clear')}
+        </button>
+        <button onClick={handleDeleteSelected} title={t('grid.buttons.delete')}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-sig-red bg-w-bg-elev border border-w-border rounded-theme-md hover:bg-w-bg-hover transition-colors">
+          <Trash2 className="w-3.5 h-3.5" /> {t('grid.buttons.delete')}
+        </button>
+
+        <div className="h-4 w-px bg-w-border mx-0.5 shrink-0" />
+
+        <button onClick={handleClearAll} onBlur={() => setClearAllPending(false)} aria-pressed={clearAllPending}
+          className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-theme-md border transition-colors ${
+            clearAllPending ? 'bg-sig-red text-white border-sig-red font-bold' : 'text-sig-red bg-w-bg-elev border-w-border hover:bg-w-bg-hover'
+          }`}>
+          <ListX className="w-3.5 h-3.5" />
+          {clearAllPending ? t('grid.alerts.confirmClearAllShort', { count: rowData.length }) : t('grid.buttons.clearAll')}
+        </button>
+
+        {/* Bulk Edit */}
+        {selectedCount > 1 && (
+          <div className="flex items-center gap-1.5 ml-2 pl-2 border-l border-w-border-strong">
+            <span className="text-[10px] font-black uppercase text-w-fg-faint tracking-widest font-mono">{selectedCount} sel.</span>
+            <select className="text-xs font-medium text-w-fg bg-w-bg-elev border border-w-border rounded-theme-sm py-1 px-1.5 cursor-pointer"
+              onChange={(e) => { if(e.target.value) { handleBulkEdit('power', e.target.value); e.target.value = ''; } }} defaultValue="">
+              <option value="" disabled>{t('grid.bulkEdit.power')}</option>
+              <option value="High">High</option><option value="Low">Low</option>
+            </select>
+            <select className="text-xs font-medium text-w-fg bg-w-bg-elev border border-w-border rounded-theme-sm py-1 px-1.5 cursor-pointer"
+              onChange={(e) => { if(e.target.value) { handleBulkEdit('mode', e.target.value); e.target.value = ''; } }} defaultValue="">
+              <option value="" disabled>{t('grid.bulkEdit.mode')}</option>
+              <option value="FM">FM</option><option value="NFM">NFM</option><option value="AM">AM</option>
+            </select>
+            <select className="text-xs font-medium text-w-fg bg-w-bg-elev border border-w-border rounded-theme-sm py-1 px-1.5 cursor-pointer"
+              onChange={(e) => { if(e.target.value) { handleBulkEdit('toneMode', e.target.value); e.target.value = ''; } }} defaultValue="">
+              <option value="" disabled>{t('grid.bulkEdit.toneMode')}</option>
+              <option value="None">None</option><option value="Tone">Tone</option><option value="TSQL">TSQL</option><option value="DTCS">DTCS</option><option value="Cross">Cross</option>
+            </select>
+            <select className="text-xs font-medium text-w-fg bg-w-bg-elev border border-w-border rounded-theme-sm py-1 px-1.5 cursor-pointer"
+              onChange={(e) => { if(e.target.value) { handleBulkEdit('duplex', e.target.value); e.target.value = ''; } }} defaultValue="">
+              <option value="" disabled>{t('grid.bulkEdit.duplex')}</option>
+              <option value="None">None</option><option value="+">+</option><option value="-">-</option><option value="Split">Split</option>
+            </select>
+          </div>
+        )}
       </div>
 
+      {/* Channel detail panel */}
+      {expandedChannel && (
+        <ChannelDetail
+          channel={expandedChannel}
+          onSave={(updated) => {
+            const newRowData = rowData.map(r => r.index === updated.index ? updated : r);
+            setRowData(newRowData);
+            if (onDataChanged) onDataChanged(newRowData);
+            setExpandedChannel(null);
+          }}
+          onDiscard={() => setExpandedChannel(null)}
+        />
+      )}
+
       {/* Grid container */}
-      <div className="flex-1 min-w-[1280px] w-full min-h-0 bg-white dark:bg-slate-900 transition-colors duration-300">
+      <div className="flex-1 min-w-[1280px] w-full min-h-0 bg-w-bg-elev transition-colors duration-300">
         <AgGridReact
           ref={gridRef}
           rowData={rowData}
           columnDefs={columnDefs as any}
           defaultColDef={defaultColDef}
           rowSelection="multiple"
+          rowHeight={32}
+          headerHeight={34}
           theme={gridTheme}
           isExternalFilterPresent={() => activeZone !== 0}
           doesExternalFilterPass={(node) => {
@@ -615,6 +576,9 @@ export function MemoryGrid({
             if (activeZone === 3) return idx >= 65 && idx <= 96;
             if (activeZone === 4) return idx >= 97 && idx <= 128;
             return true;
+          }}
+          onRowDoubleClicked={(e) => {
+            if (e.data) setExpandedChannel({ ...e.data });
           }}
           enableBrowserTooltips={true}
           stopEditingWhenCellsLoseFocus={true}
@@ -684,18 +648,18 @@ export function MemoryGrid({
        {/* RepeaterBook Modal */}
        {rbModalOpen && (
          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-           <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-xl w-full max-w-md border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95">
+           <div className="bg-w-bg-elev p-6 rounded-theme-xl shadow-card w-full max-w-md border border-w-border animate-in fade-in zoom-in-95">
              <div className="flex justify-between items-center mb-6">
-               <h3 className="text-xl font-bold flex items-center gap-2 dark:text-white">
-                 <Globe className="w-6 h-6 text-blue-500" />
+               <h3 className="text-xl font-bold flex items-center gap-2 text-w-fg">
+                 <Globe className="w-6 h-6 text-w-accent" />
                  RepeaterBook
                </h3>
-               <button onClick={() => setRbModalOpen(false)} className="text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors">
+               <button onClick={() => setRbModalOpen(false)} className="text-w-fg-faint hover:text-w-fg transition-colors">
                  <X className="w-5 h-5" />
                </button>
              </div>
-             
-             <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 font-medium">
+
+             <p className="text-sm text-w-fg-mute mb-6 font-medium">
                Import nearby open repeaters for your area without manual lookups. Currently covers Spain and Europe.
              </p>
 
@@ -703,7 +667,7 @@ export function MemoryGrid({
                e.preventDefault();
                const fd = new FormData(e.currentTarget);
                handleFetchRepeaterBook(
-                 fd.get('country') as string, 
+                 fd.get('country') as string,
                  fd.get('state') as string,
                  fd.get('band') as 'ALL' | 'VHF' | 'UHF',
                  userCoords?.lat,
@@ -711,14 +675,14 @@ export function MemoryGrid({
                );
              }} className="flex flex-col gap-4">
                <div>
-                 <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 block">
+                 <label className="text-xs font-bold uppercase tracking-wider text-w-fg-mute mb-1 block font-mono">
                    País (Anglès)
                  </label>
-                 <select 
-                   name="country" 
+                 <select
+                   name="country"
                    value={rbCountry}
                    onChange={(e) => setRbCountry(e.target.value)}
-                   className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none text-slate-800 dark:text-slate-200"
+                   className="w-full bg-w-bg-sunken border border-w-border rounded-theme-md px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-w-accent outline-none text-w-fg"
                  >
                    <option value="Spain">Spain</option>
                    <option value="Andorra">Andorra</option>
@@ -728,14 +692,14 @@ export function MemoryGrid({
                  </select>
                </div>
                <div>
-                 <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 block">
+                 <label className="text-xs font-bold uppercase tracking-wider text-w-fg-mute mb-1 block font-mono">
                    Província / Comunitat
                  </label>
                  {rbCountry === 'Spain' ? (
-                   <select 
-                     name="state" 
-                     defaultValue="Catalonia" 
-                     className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none text-slate-800 dark:text-slate-200"
+                   <select
+                     name="state"
+                     defaultValue="Catalonia"
+                     className="w-full bg-w-bg-sunken border border-w-border rounded-theme-md px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-w-accent outline-none text-w-fg"
                    >
                      <option value="Andalusia">Andalusia</option>
                      <option value="Aragon">Aragon</option>
@@ -758,21 +722,21 @@ export function MemoryGrid({
                      <option value="Melilla">Melilla</option>
                    </select>
                  ) : (
-                   <input 
+                   <input
                      required
-                     name="state" 
-                     defaultValue="" 
+                     name="state"
+                     defaultValue=""
                      placeholder="In English, e.g. Île-de-France..."
-                     className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400"
+                     className="w-full bg-w-bg-sunken border border-w-border rounded-theme-md px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-w-accent outline-none text-w-fg placeholder:text-w-fg-faint"
                    />
                  )}
                </div>
-               
+
                <div>
-                 <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 block">
+                 <label className="text-xs font-bold uppercase tracking-wider text-w-fg-mute mb-1 block font-mono">
                    Band / Frequency
                  </label>
-                 <select name="band" defaultValue="ALL" className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none text-slate-800 dark:text-slate-200">
+                 <select name="band" defaultValue="ALL" className="w-full bg-w-bg-sunken border border-w-border rounded-theme-md px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-w-accent outline-none text-w-fg">
                    <option value="ALL">All bands (VHF + UHF)</option>
                    <option value="VHF">VHF only (2 Metres)</option>
                    <option value="UHF">UHF only (70 Centimetres)</option>
@@ -780,14 +744,14 @@ export function MemoryGrid({
                </div>
 
                <div>
-                 <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 block">
+                 <label className="text-xs font-bold uppercase tracking-wider text-w-fg-mute mb-1 block font-mono">
                    Proximity (Optional)
                  </label>
-                 <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2">
-                   <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                     {userCoords ? `📍 Lat: ${userCoords.lat.toFixed(2)}, Lon: ${userCoords.lon.toFixed(2)}` : "🌐 Sort by distance"}
+                 <div className="flex items-center justify-between bg-w-bg-sunken border border-w-border rounded-theme-md px-3 py-2">
+                   <span className="text-sm font-medium text-w-fg-soft">
+                     {userCoords ? `Lat: ${userCoords.lat.toFixed(2)}, Lon: ${userCoords.lon.toFixed(2)}` : "Sort by distance"}
                    </span>
-                   
+
                    {!userCoords ? (
                      <button
                        type="button"
@@ -801,7 +765,7 @@ export function MemoryGrid({
                            );
                          }
                        }}
-                       className="text-xs font-bold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
+                       className="text-xs font-bold bg-w-bg-hover text-w-fg-soft px-3 py-1.5 rounded-theme-sm hover:bg-w-border transition-colors"
                      >
                        Locate me
                      </button>
@@ -809,20 +773,20 @@ export function MemoryGrid({
                      <button
                        type="button"
                        onClick={() => setUserCoords(null)}
-                       className="text-xs font-bold text-red-500 hover:text-red-700 transition-colors"
+                       className="text-xs font-bold text-sig-red hover:opacity-80 transition-colors"
                      >
                        Discard
                      </button>
                    )}
                  </div>
-                 {userCoords && <p className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1">Repeaters will be sorted from nearest to farthest!</p>}
+                 {userCoords && <p className="text-[10px] text-sig-green mt-1">Repeaters will be sorted from nearest to farthest!</p>}
                </div>
-               
+
                <div className="mt-2">
-                 <button 
-                   type="submit" 
+                 <button
+                   type="submit"
                    disabled={isRbLoading}
-                   className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 dark:disabled:bg-slate-800 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
+                   className="w-full bg-w-accent hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-theme-lg transition-all shadow-card flex items-center justify-center gap-2"
                  >
                    {isRbLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Globe className="w-5 h-5" />}
                    {isRbLoading ? "Descarregant API..." : "Cercar i Importar"}

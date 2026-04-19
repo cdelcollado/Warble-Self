@@ -4,9 +4,9 @@
     "subtitle": "Warble: radio programming for the web",
     "beta": "BETA 0.9",
     "tabs": {
-      "memory": "Memory",
+      "memory": "Channels",
       "usb": "USB Connection",
-      "settings": "Settings"
+      "settings": "Radio settings"
     },
     "buttons": {
       "openFile": "Open File (.img, .csv, .ddmr)",
@@ -15,14 +15,39 @@
     "sections": {
       "file": "File"
     },
+    "selectRadio": "Select radio",
     "radioBar": {
       "fileLoaded": "File loaded",
       "noFile": "No file loaded",
       "unsaved": "Unsaved changes"
     },
+    "breadcrumb": {
+      "ready": "Ready",
+      "codeplug": "codeplug",
+      "untitled": "untitled",
+      "unsaved": "unsaved",
+      "saved": "saved",
+      "connectRadio": "Connect radio"
+    },
     "alerts": {
       "importSuccess": "Successfully imported {{count}} channels from {{filename}}.",
       "importError": "Failed to parse file: {{error}}"
+    },
+    "landing": {
+      "status": "Ready",
+      "heroPrefix": "Program your",
+      "heroSuffix": "from the browser.",
+      "subtitle": "Read the current memory, edit channels in the spreadsheet, and write it back. No installers, no drivers — just a USB cable and Chrome.",
+      "readRadio": "Read from radio",
+      "readRadioDesc": "Connect via USB and download the current codeplug.",
+      "openFile": "Open file",
+      "openFileDesc": "Load from disk (.img, .csv, .ddmr).",
+      "importRepo": "Import repository",
+      "importRepoDesc": "Pick from the RepeaterBook or community.",
+      "startBlank": "Start blank",
+      "startBlankDesc": "Begin with an empty config for this radio.",
+      "waveformTitle": "Signal preview",
+      "waveformSubtitle": "standby"
     },
     "driverMismatch": {
       "title": "File does not match the selected radio",
@@ -63,6 +88,36 @@
     "logs": {
       "writeSuccess": "Hexadecimal with channels successfully uploaded to EEPROM!"
     }
+  },
+  "channelDetail": {
+    "tabs": {
+      "basics": "Basics",
+      "tones": "Tones & Squelch",
+      "dtmf": "DTMF / DCS",
+      "power": "Power & mode",
+      "notes": "Notes & Tags"
+    },
+    "fields": {
+      "name": "Channel name",
+      "frequency": "Frequency",
+      "duplex": "Duplex",
+      "offset": "Offset",
+      "mode": "Mode",
+      "toneMode": "Tone mode",
+      "tone": "Tone",
+      "toneSql": "Tone SQL",
+      "dtcsCode": "DTCS code",
+      "rxDtcsCode": "RX DTCS",
+      "dtcsPolarity": "DTCS polarity",
+      "power": "Power",
+      "skip": "Skip"
+    },
+    "unnamed": "Unnamed channel",
+    "save": "Save",
+    "discard": "Discard",
+    "skipYes": "Skip scanning",
+    "skipNo": "Include in scan",
+    "notesPlaceholder": "Notes and tags are not yet available for this radio model."
   },
   "grid": {
     "buttons": {
@@ -201,8 +256,28 @@
       "saveFailed": "Could not save profile. Please try again."
     }
   },
+  "repeaterBook": {
+    "tab": "RepeaterBook",
+    "title": "RepeaterBook",
+    "country": "Country",
+    "state": "State / Region",
+    "search": "Search",
+    "radius": "Radius",
+    "count": "{{count}} repeaters",
+    "sortDistance": "Sort: distance",
+    "sortFreq": "Sort: frequency",
+    "noResults": "No repeaters found for this search.",
+    "add": "± add",
+    "added": "{{callsign}} added to memory.",
+    "detail": {
+      "freq": "Frequency",
+      "input": "Input",
+      "offset": "Offset",
+      "mode": "Mode"
+    }
+  },
   "repository": {
-    "tab": "Repository",
+    "tab": "Codeplug repository",
     "title": "Codeplug Repository",
     "subtitle": "Browse, share, and download radio configurations from the community.",
     "loginToUpload": "Sign in to upload",

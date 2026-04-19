@@ -2,40 +2,136 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   WARBLE THEME SYSTEM
+   Three themes switchable via [data-theme]:
+     refined    — polished blue/slate (default)
+     instrument — lab/measurement-instrument vibe, dark-default
+     blueprint  — schematic grid, high contrast, minimal
+   ============================================================ */
+
 @layer base {
   :root {
+    /* Neutral scale */
+    --n-0:   #ffffff;
+    --n-50:  #f7f9fb;
+    --n-100: #eef2f7;
+    --n-150: #e3e9f0;
+    --n-200: #d6dde6;
+    --n-300: #b8c2cf;
+    --n-400: #8a95a5;
+    --n-500: #647080;
+    --n-600: #475061;
+    --n-700: #323b4c;
+    --n-800: #1e2635;
+    --n-900: #121826;
+    --n-950: #0a0e17;
+
+    /* Brand blue */
+    --b-50:  #eef4fb;
+    --b-100: #d9e6f6;
+    --b-300: #7faad8;
+    --b-500: #3a79b8;
+    --b-600: #1f5a94;
+    --b-700: #144472;
+    --b-800: #0d2f52;
+    --b-900: #081e37;
+
+    /* Signal colors */
+    --sig-green:   #1ea97c;
+    --sig-amber:   #d08a22;
+    --sig-red:     #c4354c;
+    --sig-cyan:    #2e9fbf;
+    --sig-violet:  #7158c2;
+
+    /* Typography */
+    --font-sans: "Inter Tight", "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --font-display: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+
+    /* Scales */
+    --rad-sm: 4px;
+    --rad-md: 6px;
+    --rad-lg: 10px;
+    --rad-xl: 14px;
+
+    --tr-fast: 120ms cubic-bezier(.3, .8, .3, 1);
+    --tr-med:  200ms cubic-bezier(.3, .8, .3, 1);
+
+    /* Semantic tokens (refined light — default) */
+    --w-bg:           var(--n-50);
+    --w-bg-elev:      var(--n-0);
+    --w-bg-sunken:    var(--n-100);
+    --w-bg-hover:     var(--n-100);
+    --w-fg:           var(--n-900);
+    --w-fg-soft:      var(--n-600);
+    --w-fg-mute:      var(--n-500);
+    --w-fg-faint:     var(--n-400);
+    --w-border:       var(--n-200);
+    --w-border-soft:  var(--n-150);
+    --w-border-strong:var(--n-300);
+    --w-accent:       var(--b-600);
+    --w-accent-soft:  var(--b-50);
+    --w-accent-fg:    var(--b-700);
+    --w-accent-strong:var(--b-700);
+
+    --grid-line:    rgba(30, 38, 53, 0.06);
+    --scanline:     transparent;
+    --card-shadow:  0 1px 2px rgba(15, 23, 42, 0.04), 0 2px 8px -2px rgba(15, 23, 42, 0.05);
+
+    /* Toast */
     --toast-bg: #ffffff;
     --toast-text: #0f172a;
 
+    /* Existing shadcn tokens */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
-
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-
     --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
-
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
-
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
-
     --radius: 0.5rem;
+  }
+
+  /* ========================= REFINED DARK ========================= */
+  [data-theme="refined"].dark,
+  [data-theme="refined"] .dark {
+    --w-bg:           #0e1218;
+    --w-bg-elev:      #171c26;
+    --w-bg-sunken:    #0a0d13;
+    --w-bg-hover:     #1d2431;
+    --w-fg:           #eef2f8;
+    --w-fg-soft:      #aeb9c9;
+    --w-fg-mute:      #7f8a9d;
+    --w-fg-faint:     #5a6577;
+    --w-border:       #242c3b;
+    --w-border-soft:  #1b2230;
+    --w-border-strong:#323c4e;
+    --w-accent:       #6ba3e0;
+    --w-accent-soft:  #132238;
+    --w-accent-fg:    #a4c8ef;
+    --w-accent-strong:#8fb8e8;
+
+    --sig-green:   #4fc08d;
+    --sig-amber:   #e0a94a;
+    --sig-red:     #ea6a7e;
+    --sig-cyan:    #6bc4dd;
+
+    --grid-line:    rgba(160, 180, 220, 0.04);
+    --card-shadow:  0 1px 0 rgba(255,255,255,0.02) inset, 0 6px 20px rgba(0,0,0,0.45);
   }
 
   .dark {
@@ -44,39 +140,169 @@
 
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
-
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
-
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
-
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
-
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
-
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
   }
-}
 
-@layer base {
+  /* ======================= INSTRUMENT ========================= */
+  [data-theme="instrument"] {
+    --w-bg:           #0c1016;
+    --w-bg-elev:      #141923;
+    --w-bg-sunken:    #090c12;
+    --w-bg-hover:     #1a2030;
+    --w-fg:           #e5ecf5;
+    --w-fg-soft:      #a8b4c4;
+    --w-fg-mute:      #7b879a;
+    --w-fg-faint:     #5a6578;
+    --w-border:       #242c3a;
+    --w-border-soft:  #1b2230;
+    --w-border-strong:#323c4e;
+    --w-accent:       #4fb87a;
+    --w-accent-soft:  #132420;
+    --w-accent-fg:    #8fe0a8;
+    --w-accent-strong:#6fd097;
+
+    --sig-green:   #4fb87a;
+    --sig-amber:   #e0a94a;
+    --sig-red:     #e5576e;
+    --sig-cyan:    #4fb3d9;
+
+    --grid-line:    rgba(120, 180, 200, 0.05);
+    --scanline:     rgba(120, 180, 200, 0.015);
+    --card-shadow:  0 1px 0 rgba(255,255,255,0.02) inset, 0 8px 24px rgba(0,0,0,0.5);
+  }
+
+  /* ======================== BLUEPRINT ========================= */
+  [data-theme="blueprint"] {
+    --w-bg:           #f3f0e8;
+    --w-bg-elev:      #fbf9f3;
+    --w-bg-sunken:    #ece8dc;
+    --w-bg-hover:     #e6e1d0;
+    --w-fg:           #1a1a1a;
+    --w-fg-soft:      #3a3a3a;
+    --w-fg-mute:      #6a665c;
+    --w-fg-faint:     #9a9587;
+    --w-border:       #1a1a1a;
+    --w-border-soft:  #b8b1a0;
+    --w-border-strong:#1a1a1a;
+    --w-accent:       #c8381f;
+    --w-accent-soft:  #f5e5e0;
+    --w-accent-fg:    #8d2414;
+    --w-accent-strong:#8d2414;
+
+    --sig-green:   #2e7d3f;
+    --sig-amber:   #b07010;
+    --sig-red:     #c8381f;
+    --sig-cyan:    #1e5c8a;
+
+    --grid-line:    rgba(26, 26, 26, 0.08);
+    --scanline:     transparent;
+    --card-shadow:  3px 3px 0 #1a1a1a;
+    --rad-sm: 0px;
+    --rad-md: 0px;
+    --rad-lg: 0px;
+    --rad-xl: 0px;
+  }
+
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 }
+
+/* Body grid pattern */
+body {
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: -1px -1px;
+}
+
+/* Instrument scanline overlay */
+[data-theme="instrument"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0 2px,
+    rgba(255,255,255,0.008) 2px 3px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Blueprint sharp corners override */
+[data-theme="blueprint"] * {
+  --radius: 0px;
+}
+
+/* Utility classes for theme fonts */
+.font-mono-theme {
+  font-family: var(--font-mono);
+  font-feature-settings: "ss01", "zero";
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Theme-aware nav active state for instrument */
+[data-theme="instrument"] .nav-active {
+  box-shadow: inset 2px 0 0 var(--w-accent);
+}
+
+/* Blueprint inverted active state */
+[data-theme="blueprint"] .nav-active {
+  background: var(--w-fg) !important;
+  color: var(--w-bg) !important;
+}
+
+/* Theme thumbnail previews */
+.thumb-canvas-refined {
+  background: #f7f9fb;
+  border: 1px solid #e3e9f0;
+}
+.thumb-bar-refined { background: #1f5a94; }
+.thumb-row-refined { background: #b8c2cf; }
+
+.thumb-canvas-instrument {
+  background: #0c1016;
+  border: 1px solid #242c3a;
+}
+.thumb-bar-instrument { background: #4fb87a; box-shadow: 0 0 4px rgba(79, 184, 122, 0.6); }
+.thumb-row-instrument { background: #2a6b4a; }
+
+.thumb-canvas-blueprint {
+  background:
+    linear-gradient(rgba(26,26,26,0.12) 1px, transparent 1px) 0 0 / 6px 6px,
+    linear-gradient(90deg, rgba(26,26,26,0.12) 1px, transparent 1px) 0 0 / 6px 6px,
+    #f3f0e8;
+  border: 1.5px solid #1a1a1a;
+  border-radius: 1px !important;
+}
+.thumb-bar-blueprint { background: #c8381f; }
+.thumb-row-blueprint { background: #1a1a1a; opacity: 0.5; }

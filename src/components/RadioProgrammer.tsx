@@ -117,34 +117,34 @@ export function RadioProgrammer({
   const isBusy = status === 'READING' || status === 'WRITING';
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-xl dark:shadow-slate-950/60 border border-slate-200 dark:border-slate-800 p-6 md:p-8 w-full max-w-xl transition-all duration-300">
+    <div className="bg-w-bg-elev rounded-theme-xl shadow-card border border-w-border p-6 md:p-8 w-full max-w-xl transition-all duration-300">
 
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">{t('radio.panelTitle')}</h2>
-          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t('radio.panelSubtitle')}</p>
+          <h2 className="text-xl font-bold text-w-fg tracking-tight">{t('radio.panelTitle')}</h2>
+          <p className="text-sm font-medium text-w-fg-mute">{t('radio.panelSubtitle')}</p>
         </div>
 
         {/* Status indicator */}
-        <div className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 shadow-sm border transition-colors ${
-          status === 'CONNECTED' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900' :
-          status === 'ERROR' ? 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-900' :
-          isBusy ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-900' :
-          status === 'CONNECTING' ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900' :
-          'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+        <div className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 shadow-sm border transition-colors font-mono ${
+          status === 'CONNECTED' ? 'bg-w-bg-sunken text-sig-green border-w-border' :
+          status === 'ERROR' ? 'bg-w-bg-sunken text-sig-red border-w-border' :
+          isBusy ? 'bg-w-bg-sunken text-w-accent-fg border-w-border' :
+          status === 'CONNECTING' ? 'bg-w-bg-sunken text-sig-amber border-w-border' :
+          'bg-w-bg-sunken text-w-fg-mute border-w-border'
         }`}>
           <span className="relative flex h-2 w-2 shrink-0">
             {(isBusy || status === 'CONNECTING') && (
               <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                status === 'CONNECTING' ? 'bg-amber-400' : 'bg-blue-400'
+                status === 'CONNECTING' ? 'bg-sig-amber' : 'bg-w-accent'
               }`} />
             )}
             <span className={`relative inline-flex rounded-full h-2 w-2 ${
-              status === 'CONNECTED' ? 'bg-emerald-500' :
-              status === 'ERROR' ? 'bg-red-500' :
-              isBusy ? 'bg-blue-500' :
-              status === 'CONNECTING' ? 'bg-amber-400' :
-              'bg-slate-400'
+              status === 'CONNECTED' ? 'bg-sig-green' :
+              status === 'ERROR' ? 'bg-sig-red' :
+              isBusy ? 'bg-w-accent' :
+              status === 'CONNECTING' ? 'bg-sig-amber' :
+              'bg-w-fg-faint'
             }`} />
           </span>
           {status === 'ERROR' && <AlertCircle className="w-3.5 h-3.5"/>}
@@ -185,24 +185,28 @@ export function RadioProgrammer({
       </div>
 
       {isBusy && (
-        <div className="mt-8 p-5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-          <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
+        <div className="mt-8 p-5 rounded-theme-lg bg-w-bg-sunken border border-w-border-soft">
+          <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-w-fg-mute mb-3 font-mono">
             <span>{status === 'READING' ? t('radio.progress.reading') : t('radio.progress.writing')}</span>
-            <span className="text-blue-600 dark:text-blue-400 font-black">{Math.round(progress)}%</span>
+            <span className="text-w-accent-fg font-black">{Math.round(progress)}%</span>
           </div>
-          <div className="w-full bg-slate-200/60 dark:bg-slate-700/60 rounded-full h-2.5 overflow-hidden shadow-inner">
+          <div className="w-full bg-w-bg rounded-full h-2.5 overflow-hidden shadow-inner border border-w-border-soft">
             <div
-              className="bg-gradient-to-r from-blue-600 to-blue-400 h-2.5 rounded-full transition-all duration-300 ease-out shadow-[0_0_8px_rgba(59,130,246,0.5)]"
-              style={{ width: `${Math.max(2, progress)}%` }}
+              className="h-2.5 rounded-full transition-all duration-300 ease-out"
+              style={{
+                width: `${Math.max(2, progress)}%`,
+                background: `linear-gradient(90deg, var(--w-accent), var(--w-accent-strong))`,
+                boxShadow: `0 0 8px color-mix(in srgb, var(--w-accent) 50%, transparent)`
+              }}
             />
           </div>
         </div>
       )}
 
       {status === 'CONNECTED' && (
-         <div className="mt-8 text-center text-sm text-slate-600 dark:text-slate-400 bg-sky-50 dark:bg-sky-900/20 rounded-xl p-4 border border-sky-100 dark:border-sky-900/50 shadow-sm">
-           <p className="font-medium text-sky-800 dark:text-sky-300 mb-1">{t('radio.ready.title')}</p>
-           <p className="text-sky-600/80 dark:text-sky-400/80">{t('radio.ready.description')}</p>
+         <div className="mt-8 text-center text-sm text-w-fg-soft bg-w-accent-soft rounded-theme-lg p-4 border border-w-border shadow-sm">
+           <p className="font-medium text-w-accent-fg mb-1">{t('radio.ready.title')}</p>
+           <p className="text-w-fg-mute">{t('radio.ready.description')}</p>
          </div>
       )}
     </div>

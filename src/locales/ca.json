@@ -4,9 +4,9 @@
     "subtitle": "Warble: programació de ràdios per al web",
     "beta": "BETA 0.9",
     "tabs": {
-      "memory": "Memòria",
+      "memory": "Canals",
       "usb": "Connexió USB",
-      "settings": "Configuració"
+      "settings": "Config. ràdio"
     },
     "buttons": {
       "openFile": "Obrir Fitxer (.img, .csv, .ddmr)",
@@ -15,14 +15,39 @@
     "sections": {
       "file": "Arxiu"
     },
+    "selectRadio": "Seleccionar ràdio",
     "radioBar": {
       "fileLoaded": "Fitxer carregat",
       "noFile": "Cap fitxer carregat",
       "unsaved": "Canvis pendents"
     },
+    "breadcrumb": {
+      "ready": "Llest",
+      "codeplug": "codeplug",
+      "untitled": "sense títol",
+      "unsaved": "sense desar",
+      "saved": "desat",
+      "connectRadio": "Connectar ràdio"
+    },
     "alerts": {
       "importSuccess": "S'han importat correctament {{count}} canals de l'arxiu {{filename}}.",
       "importError": "Error en obrir el fitxer: {{error}}"
+    },
+    "landing": {
+      "status": "Llest",
+      "heroPrefix": "Programa la teva",
+      "heroSuffix": "des del navegador.",
+      "subtitle": "Llegeix la memòria actual, edita els canals al full de càlcul i escriu-la de tornada. Sense instal·ladors ni drivers — només un cable USB i Chrome.",
+      "readRadio": "Llegir de la ràdio",
+      "readRadioDesc": "Connecta per USB i descarrega el codeplug actual.",
+      "openFile": "Obrir fitxer",
+      "openFileDesc": "Carrega des del disc (.img, .csv, .ddmr).",
+      "importRepo": "Importar repositori",
+      "importRepoDesc": "Tria del RepeaterBook o la comunitat.",
+      "startBlank": "Començar en blanc",
+      "startBlankDesc": "Comença amb una config buida per aquesta ràdio.",
+      "waveformTitle": "Previsualització de senyal",
+      "waveformSubtitle": "en espera"
     },
     "driverMismatch": {
       "title": "El fitxer no correspon a la ràdio seleccionada",
@@ -63,6 +88,36 @@
     "logs": {
       "writeSuccess": "Hexadecimal amb els Canals inserits pujat a EEPROM amb èxit!"
     }
+  },
+  "channelDetail": {
+    "tabs": {
+      "basics": "Bàsics",
+      "tones": "Tons i Squelch",
+      "dtmf": "DTMF / DCS",
+      "power": "Potència i mode",
+      "notes": "Notes i Tags"
+    },
+    "fields": {
+      "name": "Nom del canal",
+      "frequency": "Freqüència",
+      "duplex": "Dúplex",
+      "offset": "Offset",
+      "mode": "Mode",
+      "toneMode": "Mode de to",
+      "tone": "To",
+      "toneSql": "To SQL",
+      "dtcsCode": "Codi DTCS",
+      "rxDtcsCode": "RX DTCS",
+      "dtcsPolarity": "Polaritat DTCS",
+      "power": "Potència",
+      "skip": "Saltar"
+    },
+    "unnamed": "Canal sense nom",
+    "save": "Desar",
+    "discard": "Descartar",
+    "skipYes": "Saltar escaneig",
+    "skipNo": "Incloure a l'escaneig",
+    "notesPlaceholder": "Les notes i etiquetes encara no estan disponibles per aquest model de ràdio."
   },
   "grid": {
     "buttons": {
@@ -201,8 +256,28 @@
       "saveFailed": "No s'ha pogut desar el perfil. Torna-ho a intentar."
     }
   },
+  "repeaterBook": {
+    "tab": "RepeaterBook",
+    "title": "RepeaterBook",
+    "country": "País",
+    "state": "Estat / Regió",
+    "search": "Cercar",
+    "radius": "Radi",
+    "count": "{{count}} repetidors",
+    "sortDistance": "Ordre: distància",
+    "sortFreq": "Ordre: freqüència",
+    "noResults": "No s'han trobat repetidors per aquesta cerca.",
+    "add": "± afegir",
+    "added": "{{callsign}} afegit a la memòria.",
+    "detail": {
+      "freq": "Freqüència",
+      "input": "Entrada",
+      "offset": "Offset",
+      "mode": "Mode"
+    }
+  },
   "repository": {
-    "tab": "Repositori",
+    "tab": "Repositori codeplug",
     "title": "Repositori de Codefiles",
     "subtitle": "Cerca, comparteix i descarrega configuracions de ràdio de la comunitat.",
     "loginToUpload": "Inicia sessió per pujar",

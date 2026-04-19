@@ -7,20 +7,23 @@ import type { MemoryChannel, GlobalSettings, SettingDef } from './lib/types';
 import { defaultChannels } from './lib/types';
 import { GlobalSettingsView } from './components/GlobalSettings';
 import { useToast } from './hooks/useToast';
+import { useTheme } from './hooks/useTheme';
 import { RepositoryPage } from './repository/RepositoryPage';
 import { Sidebar } from './components/Sidebar';
+import { LandingPage } from './components/LandingPage';
+import { RepeaterBookPage } from './components/RepeaterBookPage';
 import { detectRadioFromImg, MODEL_TO_DRIVER_ID } from './lib/imgDetection';
 import { decodeRT4D } from './lib/drivers/rt4d';
-import { AlertTriangle, X, Radio, Cable } from 'lucide-react';
+import { AlertTriangle, X, Radio, Cable, ChevronRight } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
 
-type Tab = 'memory' | 'settings' | 'repository'
+type Tab = 'home' | 'memory' | 'settings' | 'repeaterbook' | 'repository'
 
 function App() {
   const { t } = useTranslation();
   const toast = useToast();
 
-  const [activeTab, setActiveTab] = useState<Tab>('memory');
+  const [activeTab, setActiveTab] = useState<Tab>('home');
   const [showConnectionPanel, setShowConnectionPanel] = useState(false);
 
   const [channels, setChannels] = useState<MemoryChannel[]>(defaultChannels);
@@ -38,21 +41,13 @@ function App() {
   const channelCount = SUPPORTED_RADIOS.find(r => r.id === selectedDriverId)?.channelCount ?? 128;
 
   const [rawBuffer, setRawBuffer] = useState<Uint8Array | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { isDark } = useTheme();
   const [isDirty, setIsDirty] = useState(false);
 
   type DriverMismatch = { file: File; detectedDriverId: string; detectedModel: string }
   const [driverMismatch, setDriverMismatch] = useState<DriverMismatch | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -232,11 +227,7 @@ function App() {
   };
 
   return (
-    <div className="h-screen flex overflow-hidden bg-slate-50 dark:bg-slate-950 selection:bg-blue-100 dark:selection:bg-blue-900 transition-colors duration-300">
-
-      {/* Background blobs */}
-      <div className="fixed top-[-10%] right-[-5%] w-96 h-96 bg-blue-400/15 dark:bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="fixed bottom-[-10%] right-[20%] w-96 h-96 bg-indigo-400/15 dark:bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
+    <div className="h-screen flex overflow-hidden bg-w-bg selection:bg-w-accent-soft transition-colors duration-300">
 
       {/* Hidden file input */}
       <input
@@ -251,8 +242,6 @@ function App() {
       <Sidebar
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        isDarkMode={isDarkMode}
-        onToggleDarkMode={() => setIsDarkMode(prev => !prev)}
         selectedDriverId={selectedDriverId}
         onDriverChange={handleDriverChange}
         rawBuffer={rawBuffer}
@@ -266,45 +255,68 @@ function App() {
       {/* Main content */}
       <main className="flex-1 flex flex-col overflow-hidden">
 
-        {/* Active radio bar */}
-        {activeTab !== 'repository' && (
-          <div className="shrink-0 flex items-center gap-3 px-6 py-2.5 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
-            <Radio className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
-            <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
-              {SUPPORTED_RADIOS.find(r => r.id === selectedDriverId)?.name ?? selectedDriverId}
-            </span>
-            <div className="flex items-center gap-2 ml-1">
-              {rawBuffer ? (
-                <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                  {t('app.radioBar.fileLoaded')}
-                </span>
-              ) : (
-                <span className="text-xs text-slate-400 dark:text-slate-500">
-                  {t('app.radioBar.noFile')}
-                </span>
-              )}
-              {isDirty && (
-                <span className="flex items-center gap-1.5 text-xs font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
-                  {t('app.radioBar.unsaved')}
-                </span>
-              )}
-            </div>
-            <button
-              onClick={() => setShowConnectionPanel(p => !p)}
-              className={`ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
-                showConnectionPanel
-                  ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400'
-                  : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-              }`}
-            >
-              <Cable className="w-3.5 h-3.5" />
-              {t('app.tabs.usb')}
-            </button>
-          </div>
-        )}
-        {activeTab === 'settings' ? (
+        {/* Breadcrumb bar */}
+        <div className="shrink-0 flex items-center gap-1.5 px-5 py-2 border-b border-w-border bg-w-bg-elev/80 backdrop-blur-sm text-xs">
+          {/* Status */}
+          <span className="flex items-center gap-1.5 font-semibold text-w-fg-soft">
+            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${rawBuffer ? 'bg-sig-green' : 'bg-w-fg-faint'}`} />
+            {t('app.breadcrumb.ready')}
+          </span>
+          <ChevronRight className="w-3 h-3 text-w-fg-faint shrink-0" />
+
+          {/* Radio model */}
+          <span className="font-bold text-w-accent-fg">
+            {SUPPORTED_RADIOS.find(r => r.id === selectedDriverId)?.name ?? selectedDriverId}
+          </span>
+          <ChevronRight className="w-3 h-3 text-w-fg-faint shrink-0" />
+
+          {/* Codeplug */}
+          <span className="font-medium text-w-fg-mute">{t('app.breadcrumb.codeplug')}</span>
+          <ChevronRight className="w-3 h-3 text-w-fg-faint shrink-0" />
+
+          {/* Filename / untitled */}
+          <span className="font-medium text-w-fg-soft">{t('app.breadcrumb.untitled')}</span>
+
+          {/* Saved/unsaved indicator */}
+          <span className="flex items-center gap-1 ml-0.5">
+            <span className="text-w-fg-faint">•</span>
+            {isDirty ? (
+              <span className="flex items-center gap-1 font-medium text-sig-amber">
+                <span className="w-1.5 h-1.5 rounded-full bg-sig-amber shrink-0" />
+                {t('app.breadcrumb.unsaved')}
+              </span>
+            ) : (
+              <span className="font-medium text-w-fg-faint">{t('app.breadcrumb.saved')}</span>
+            )}
+          </span>
+
+          {/* Connect radio button */}
+          <button
+            onClick={() => setShowConnectionPanel(p => !p)}
+            className={`ml-auto flex items-center gap-1.5 px-3.5 py-1.5 rounded-theme-md text-xs font-bold border transition-colors ${
+              showConnectionPanel
+                ? 'bg-w-accent text-white border-w-accent shadow-sm'
+                : 'border-w-border text-w-fg-soft hover:bg-w-bg-hover'
+            }`}
+          >
+            <Cable className="w-3.5 h-3.5" />
+            {t('app.breadcrumb.connectRadio')}
+          </button>
+        </div>
+        {activeTab === 'home' ? (
+          <LandingPage
+            radioName={SUPPORTED_RADIOS.find(r => r.id === selectedDriverId)?.name ?? selectedDriverId}
+            channelCount={channelCount}
+            onConnectRadio={() => setShowConnectionPanel(true)}
+            onOpenFile={() => fileInputRef.current?.click()}
+            onImportRepository={() => setActiveTab('repository')}
+            onStartBlank={() => {
+              setChannels(defaultChannels);
+              setIsDirty(true);
+              setActiveTab('memory');
+            }}
+          />
+        ) : activeTab === 'settings' ? (
           <div className="flex-1 overflow-y-auto p-6">
             <GlobalSettingsView
               schema={settingsSchema}
@@ -315,10 +327,20 @@ function App() {
               }}
             />
           </div>
+        ) : activeTab === 'repeaterbook' ? (
+          <RepeaterBookPage
+            onAddChannels={(newChannels) => {
+              const presentIndexes = channels.map(r => r.index);
+              const nextId = presentIndexes.length > 0 ? Math.max(...presentIndexes) + 1 : 1;
+              const assigned = newChannels.map((ch, i) => ({ ...ch, index: nextId + i }));
+              setChannels(prev => [...prev, ...assigned].sort((a, b) => a.index - b.index));
+              setIsDirty(true);
+            }}
+          />
         ) : activeTab === 'repository' ? (
           <div className="flex-1 overflow-y-auto p-6">
             <RepositoryPage
-              isDarkMode={isDarkMode}
+              isDarkMode={isDark}
               onLoadToEditor={(newChannels, model) => {
                 const detectedDriverId = MODEL_TO_DRIVER_ID[model];
                 if (detectedDriverId && detectedDriverId !== selectedDriverId) {
@@ -340,10 +362,34 @@ function App() {
                 setChannels(newData);
                 setIsDirty(true);
               }}
-              isDarkMode={isDarkMode}
+              isDarkMode={isDark}
             />
           </div>
         )}
+        {/* Bottom status bar */}
+        <div className="shrink-0 flex items-center gap-4 px-5 py-1.5 border-t border-w-border bg-w-bg-elev/80 text-[11px] font-mono text-w-fg-faint">
+          <span className="flex items-center gap-1.5">
+            <span className="font-bold text-w-fg-soft">{channels.length}</span>
+            <span>/</span>
+            <span>{channelCount}</span>
+          </span>
+          {frequencyLimits.length > 0 && (
+            <>
+              <span className="text-w-border">|</span>
+              {frequencyLimits.map((l, i) => (
+                <span key={i} className="flex items-center gap-1">
+                  <span>{l.min}</span>
+                  <span className="text-w-fg-faint">–</span>
+                  <span>{l.max}</span>
+                  {i < frequencyLimits.length - 1 && <span className="text-w-border ml-1">·</span>}
+                </span>
+              ))}
+            </>
+          )}
+          {activeTab === 'memory' && (
+            <span className="ml-auto">{isDirty ? t('app.breadcrumb.unsaved') : t('app.breadcrumb.saved')}</span>
+          )}
+        </div>
       </main>
 
       {/* Connection drawer backdrop */}
@@ -355,15 +401,15 @@ function App() {
       )}
 
       {/* Connection drawer */}
-      <div className={`fixed right-0 top-0 h-full z-50 w-full max-w-sm flex flex-col bg-slate-50 dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800 shadow-2xl shadow-slate-200/60 dark:shadow-slate-950/70 transition-transform duration-300 ease-in-out ${showConnectionPanel ? 'translate-x-0' : 'translate-x-full'}`}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
-          <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            <Cable className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+      <div className={`fixed right-0 top-0 h-full z-50 w-full max-w-sm flex flex-col bg-w-bg border-l border-w-border shadow-card transition-transform duration-300 ease-in-out ${showConnectionPanel ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-w-border shrink-0">
+          <h2 className="text-base font-bold text-w-fg flex items-center gap-2">
+            <Cable className="w-4 h-4 text-w-accent" />
             {t('app.tabs.usb')}
           </h2>
           <button
             onClick={() => setShowConnectionPanel(false)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-theme-md text-w-fg-faint hover:text-w-fg-soft hover:bg-w-bg-hover transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -392,28 +438,28 @@ function App() {
       {/* Driver Mismatch Modal */}
       {driverMismatch && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl shadow-2xl shadow-slate-200/60 dark:shadow-slate-950/70 p-6 flex flex-col gap-4">
+          <div className="w-full max-w-sm bg-w-bg-elev rounded-theme-xl shadow-card p-6 flex flex-col gap-4">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+              <AlertTriangle className="w-5 h-5 text-sig-amber shrink-0 mt-0.5" />
               <div>
-                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                <h3 className="text-sm font-bold text-w-fg">
                   {t('app.driverMismatch.title')}
                 </h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                <p className="text-sm text-w-fg-soft mt-1">
                   {t('app.driverMismatch.message', {
                     detected: driverMismatch.detectedModel,
                     current: SUPPORTED_RADIOS.find(r => r.id === selectedDriverId)?.name ?? selectedDriverId,
                   })}
                 </p>
               </div>
-              <button onClick={() => setDriverMismatch(null)} className="ml-auto p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+              <button onClick={() => setDriverMismatch(null)} className="ml-auto p-1 text-w-fg-faint hover:text-w-fg-soft">
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setDriverMismatch(null)}
-                className="px-4 py-2 text-sm rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="px-4 py-2 text-sm rounded-theme-xl text-w-fg-soft hover:bg-w-bg-hover transition-colors"
               >
                 {t('app.driverMismatch.cancel')}
               </button>
@@ -423,7 +469,7 @@ function App() {
                   setDriverMismatch(null);
                   processImgFile(m.file, m.detectedDriverId);
                 }}
-                className="px-4 py-2 text-sm rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors"
+                className="px-4 py-2 text-sm rounded-theme-xl bg-w-accent hover:brightness-110 text-white font-semibold transition-colors"
               >
                 {t('app.driverMismatch.switchAndLoad', { model: driverMismatch.detectedModel })}
               </button>

@@ -36,7 +36,7 @@ export function GlobalSettingsView({ schema, settings, onChange }: GlobalSetting
 
   if (!schema || schema.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-slate-500">
+      <div className="flex flex-col items-center justify-center p-8 text-w-fg-mute">
         <Settings2 className="w-12 h-12 mb-4 opacity-20" />
         <p>{t('settings.noSettings')}</p>
       </div>
@@ -44,10 +44,10 @@ export function GlobalSettingsView({ schema, settings, onChange }: GlobalSetting
   }
 
   return (
-    <div className="flex flex-col h-full w-full bg-white dark:bg-slate-900 rounded-xl shadow-sm shadow-slate-100/80 dark:shadow-slate-950/40 border border-slate-200 dark:border-slate-800 overflow-y-auto p-6 transition-colors duration-300">
+    <div className="flex flex-col h-full w-full bg-w-bg-elev rounded-theme-lg shadow-card border border-w-border overflow-y-auto p-6 transition-colors duration-300">
       <div className="flex items-center gap-3 mb-6">
-        <Settings2 className="w-6 h-6 text-blue-600 dark:text-blue-500" />
-        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">{t('settings.title')}</h2>
+        <Settings2 className="w-6 h-6 text-w-accent" />
+        <h2 className="text-xl font-bold text-w-fg">{t('settings.title')}</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -55,10 +55,10 @@ export function GlobalSettingsView({ schema, settings, onChange }: GlobalSetting
           const value = settings[def.id] !== undefined ? settings[def.id] : def.default;
 
           return (
-            <div key={def.id} className="flex flex-col gap-2 p-4 rounded-xl bg-gradient-to-br from-white to-slate-50/80 dark:from-slate-800 dark:to-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm shadow-slate-100/80 dark:shadow-slate-950/40 hover:shadow-md hover:shadow-slate-200/60 dark:hover:shadow-slate-950/50 transition-shadow">
-              <label 
-                htmlFor={def.id} 
-                className="text-sm font-semibold text-slate-700 dark:text-slate-300"
+            <div key={def.id} className="flex flex-col gap-2 p-4 rounded-theme-lg bg-w-bg-elev border border-w-border shadow-card hover:shadow-md transition-shadow">
+              <label
+                htmlFor={def.id}
+                className="text-sm font-semibold text-w-fg-soft"
               >
                 {t(def.label)}
               </label>
@@ -73,9 +73,10 @@ export function GlobalSettingsView({ schema, settings, onChange }: GlobalSetting
                     step={def.step || 1}
                     value={value}
                     onChange={(e) => handleNumberChange(e, def)}
-                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer dark:bg-slate-700 accent-blue-600 mr-3"
+                    className="w-full h-2 bg-w-bg-sunken rounded-lg appearance-none cursor-pointer mr-3"
+                    style={{ accentColor: 'var(--w-accent)' }}
                   />
-                  <span className="text-sm font-mono bg-white dark:bg-slate-900 px-2 py-1 rounded border border-slate-200 dark:border-slate-700 w-12 text-center text-slate-800 dark:text-slate-200 shadow-sm">
+                  <span className="text-sm font-mono bg-w-bg px-2 py-1 rounded-theme-sm border border-w-border w-12 text-center text-w-fg shadow-sm">
                     {value}
                   </span>
                 </div>
@@ -90,8 +91,15 @@ export function GlobalSettingsView({ schema, settings, onChange }: GlobalSetting
                     onChange={(e) => handleBooleanChange(e, def)}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                  <span className="ml-3 text-sm font-medium text-slate-600 dark:text-slate-400">
+                  <div className="w-11 h-6 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:rounded-full after:h-5 after:w-5 after:transition-all peer-focus:outline-none peer-focus:ring-4"
+                    style={{
+                      backgroundColor: value ? 'var(--w-accent)' : 'var(--w-border-strong)',
+                      '--tw-ring-color': 'color-mix(in srgb, var(--w-accent) 30%, transparent)',
+                    } as React.CSSProperties}
+                  >
+                    <span className="absolute top-[2px] left-[2px] h-5 w-5 rounded-full bg-w-bg-elev border border-w-border shadow-sm transition-all" style={{ transform: value ? 'translateX(100%)' : 'none' }} />
+                  </div>
+                  <span className="ml-3 text-sm font-medium text-w-fg-soft">
                     {value ? t('settings.on') : t('settings.off')}
                   </span>
                 </label>
@@ -102,7 +110,8 @@ export function GlobalSettingsView({ schema, settings, onChange }: GlobalSetting
                   id={def.id}
                   value={value}
                   onChange={(e) => handleSelectChange(e, def)}
-                  className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 shadow-sm transition-colors"
+                  className="bg-w-bg border border-w-border text-w-fg text-sm rounded-theme-md block w-full p-2.5 shadow-sm transition-colors outline-none"
+                  style={{ '--tw-ring-color': 'var(--w-accent)' } as React.CSSProperties}
                 >
                   {def.options?.map(opt => (
                     <option key={opt.value} value={opt.value}>
