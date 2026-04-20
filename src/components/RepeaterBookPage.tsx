@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Search, MapPin, Plus, Minus, Loader2, SortAsc } from 'lucide-react';
+import { Search, MapPin, Plus, Loader2, SortAsc } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '../hooks/useToast';
 import { fetchRepeaterBookRaw, repeaterToChannel, type RepeaterResult } from '../lib/repeaterbook';

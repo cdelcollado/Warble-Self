@@ -14,7 +14,7 @@ import { LandingPage } from './components/LandingPage';
 import { RepeaterBookPage } from './components/RepeaterBookPage';
 import { detectRadioFromImg, MODEL_TO_DRIVER_ID } from './lib/imgDetection';
 import { decodeRT4D } from './lib/drivers/rt4d';
-import { AlertTriangle, X, Radio, Cable, ChevronRight } from 'lucide-react';
+import { AlertTriangle, X, Cable, ChevronRight } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
 
 type Tab = 'home' | 'memory' | 'settings' | 'repeaterbook' | 'repository'
