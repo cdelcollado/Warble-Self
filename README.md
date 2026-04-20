@@ -79,6 +79,17 @@ Available in **Catalan (CA)**, **Spanish (ES)**, and **English (EN)** — auto-d
 
 ### Option A — Docker (recommended)
 
+#### Prerequisites
+- **Docker Engine** (v20.10+) and **Docker Compose v2**. On fresh Ubuntu/Debian:
+  ```bash
+  sudo apt update && sudo apt install -y docker.io docker-compose-v2 openssl git
+  sudo usermod -aG docker $USER   # then log out and back in, or run: newgrp docker
+  ```
+  Run docker commands as your normal user (not with `sudo`) — `sudo docker compose` can behave differently from plain `docker compose` on some hosts.
+- **CPU with x86-64-v2 support** (any Intel Nehalem / AMD Bulldozer or newer, ~2009+). Older CPUs will fail with `Fatal glibc error: CPU does not support x86-64-v2` when MinIO starts.
+
+#### Install
+
 ```bash
 # 1. Clone the repository
 git clone https://github.com/cdelcollado/Warble-Self.git
@@ -89,11 +100,26 @@ cd Warble-Self
 
 # 3. Build and start everything
 docker compose up --build -d
+
+# 4. Check that all five containers are up and healthy
+docker compose ps
 ```
 
 Open **http://localhost** in your browser. No registration required — you're the only user.
 
 > For production with a real domain and HTTPS, edit `.env` before step 3 and set `DOMAIN`, `BETTER_AUTH_URL` and `FRONTEND_URL`. See [QUICKSTART.md](QUICKSTART.md) for SSL and Cloudflare setup.
+
+#### Updating to a newer version
+
+`docker compose up --build -d` alone can reuse cached image layers and keep serving old code. After `git pull`, force a clean rebuild:
+
+```bash
+git pull origin main
+docker compose build --no-cache frontend backend
+docker compose up -d --force-recreate frontend backend
+```
+
+Then hard-refresh your browser (`Ctrl+Shift+R` / `Cmd+Shift+R`) to drop the cached SPA.
 
 ### Option B — Local Development
 
