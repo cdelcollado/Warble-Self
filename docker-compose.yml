@@ -39,16 +39,12 @@ services:
       dockerfile: Dockerfile
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-warble}:${POSTGRES_PASSWORD:-warble_secret}@postgres:5432/${POSTGRES_DB:-warble}
-      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
-      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost}
       MINIO_ENDPOINT: http://minio:9000
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-warble_minio}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-warble_minio_secret}
       MINIO_BUCKET: ${MINIO_BUCKET:-codefiles}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
       ADMIN_SECRET: ${ADMIN_SECRET}
-      RESEND_API_KEY: ${RESEND_API_KEY:-}
-      FROM_EMAIL: ${FROM_EMAIL:-}
     depends_on:
       postgres:
         condition: service_healthy

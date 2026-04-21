@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- **Better Auth** (2026-04-21): Removed all Better Auth dead code — `src/auth/` (AuthModal, ProfileModal, useAuth), `backend/src/auth/index.ts`, `authApi()` in `src/lib/api.ts`. Single-user architecture uses `LOCAL_USER_ID = 'local'` with no auth layer.
+- **Resend** (2026-04-21): Removed `resend` and `better-auth` npm packages from backend.
+- **Better Auth DB tables** (2026-04-21): Removed `user`, `session`, `account`, `verification` tables from schema and regenerated clean migration. The `profiles` table no longer FK-references a `user` table.
+- **FEATURES.md / WARBLE_ONLINE.md** (2026-04-21): Deleted orphaned docs — FEATURES.md was a leftover from the pre-backend Warble project; WARBLE_ONLINE.md described a Supabase architecture replaced by Fastify+Drizzle+MinIO.
+
 ### Fixed
 - **Caddyfile** (2026-04-21): Force explicit `http://` scheme to avoid TLS negotiation issues in plain HTTP deployments
 - **setup.sh** (2026-04-21): Use `openssl rand -hex 32` for `POSTGRES_PASSWORD` to avoid special characters from base64 breaking connection strings

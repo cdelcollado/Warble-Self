@@ -23,7 +23,6 @@ fi
 POSTGRES_PASSWORD=$(openssl rand -hex 32)
 MINIO_ACCESS_KEY=$(openssl rand -hex 8)
 MINIO_SECRET_KEY=$(openssl rand -base64 32)
-BETTER_AUTH_SECRET=$(openssl rand -base64 32)
 ADMIN_SECRET=$(openssl rand -base64 32)
 
 # ── Write .env ────────────────────────────────────────────────────────────────
@@ -32,7 +31,6 @@ sed \
   -e "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=${POSTGRES_PASSWORD}|" \
   -e "s|^MINIO_ACCESS_KEY=.*|MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}|" \
   -e "s|^MINIO_SECRET_KEY=.*|MINIO_SECRET_KEY=${MINIO_SECRET_KEY}|" \
-  -e "s|^BETTER_AUTH_SECRET=.*|BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}|" \
   -e "s|^ADMIN_SECRET=.*|ADMIN_SECRET=${ADMIN_SECRET}|" \
   .env.example > .env
 
@@ -44,16 +42,13 @@ echo ""
 echo "  POSTGRES_PASSWORD  → generated"
 echo "  MINIO_ACCESS_KEY   → generated"
 echo "  MINIO_SECRET_KEY   → generated"
-echo "  BETTER_AUTH_SECRET → generated"
 echo "  ADMIN_SECRET       → generated"
 echo ""
-echo "  DOMAIN             → localhost  (change for production HTTPS)"
-echo "  BETTER_AUTH_URL    → http://localhost  (change for production)"
+echo "  DOMAIN             → localhost  (change for production)"
 echo "  FRONTEND_URL       → http://localhost  (change for production)"
 echo ""
 echo "For production with a real domain, edit .env and set:"
 echo "  DOMAIN=your.domain.com"
-echo "  BETTER_AUTH_URL=https://your.domain.com"
 echo "  FRONTEND_URL=https://your.domain.com"
 echo ""
 echo "Then run: docker compose up --build -d"

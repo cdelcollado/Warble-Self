@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1775469020002,
-      "tag": "0000_absent_nuke",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1775748893620,
-      "tag": "0001_tiny_princess_powerful",
+      "when": 1745280000000,
+      "tag": "0000_init",
       "breakpoints": true
     }
   ]

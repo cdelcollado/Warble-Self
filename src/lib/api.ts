@@ -22,27 +22,6 @@ export async function api<T>(
   }
 }
 
-export async function authApi<T>(
-  path: string,
-  options: RequestInit = {},
-): Promise<{ data: T | null; error: string | null }> {
-  try {
-    const res = await fetch(`${BASE}/api/auth${path}`, {
-      ...options,
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    })
-    const json = await res.json()
-    if (!res.ok) return { data: null, error: json.message ?? json.code ?? 'Auth error' }
-    return { data: json as T, error: null }
-  } catch (err) {
-    return { data: null, error: err instanceof Error ? err.message : 'Network error' }
-  }
-}
-
 export async function apiBuffer(
   path: string,
 ): Promise<{ buffer: Uint8Array | null; error: string | null }> {
