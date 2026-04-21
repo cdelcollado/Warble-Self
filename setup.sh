@@ -20,7 +20,7 @@ fi
 
 # ── Generate secrets ──────────────────────────────────────────────────────────
 
-POSTGRES_PASSWORD=$(openssl rand -base64 32)
+POSTGRES_PASSWORD=$(openssl rand -hex 32)
 MINIO_ACCESS_KEY=$(openssl rand -hex 8)
 MINIO_SECRET_KEY=$(openssl rand -base64 32)
 BETTER_AUTH_SECRET=$(openssl rand -base64 32)

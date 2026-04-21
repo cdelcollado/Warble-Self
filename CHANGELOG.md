@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Caddyfile** (2026-04-21): Force explicit `http://` scheme to avoid TLS negotiation issues in plain HTTP deployments
+- **setup.sh** (2026-04-21): Use `openssl rand -hex 32` for `POSTGRES_PASSWORD` to avoid special characters from base64 breaking connection strings
+
 ### Added
 - **UI redesign — Blueprint theme** (2026-04-19)
   - Consolidated to a single **Blueprint** theme (sepia/cream tones, red accent, sharp corners) — removed Refined and Instrument themes
