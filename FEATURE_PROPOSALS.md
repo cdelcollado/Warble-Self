@@ -20,12 +20,6 @@ This document contains proposals for new features and improvements to existing f
 
 **Total**: 33 feature proposals
 
-> Community and repository features (user accounts, codeplug sharing, ratings, comments) are part of **Warble Online**. See `WARBLE_ONLINE.md`.
-
----
-
-> **Note:** Community and repository features (user accounts, codeplug sharing, ratings, comments, moderation) are part of **Warble Online**. See `WARBLE_ONLINE.md` for the full specification and implementation status.
-
 ---
 
 ## 🎯 High Priority Features

@@ -107,7 +107,7 @@ docker compose ps
 
 Open **http://localhost** in your browser. No registration required — you're the only user.
 
-> For production with a real domain and HTTPS, edit `.env` before step 3 and set `DOMAIN`, `BETTER_AUTH_URL` and `FRONTEND_URL`. See [QUICKSTART.md](QUICKSTART.md) for SSL and Cloudflare setup.
+> For production with HTTPS, edit `.env` and set `DOMAIN`, `BETTER_AUTH_URL` and `FRONTEND_URL`, then remove the `http://` prefix from `Caddyfile` so Caddy obtains a Let's Encrypt certificate. See [QUICKSTART.md](QUICKSTART.md) for SSL and Cloudflare setup.
 
 #### Updating to a newer version
 
@@ -190,7 +190,7 @@ Backend: **http://localhost:3000**
 Browser
   │
   ▼
-Caddy:80/443  (automatic HTTPS via Let's Encrypt)
+Caddy:80  (HTTP by default; edit Caddyfile to enable Let's Encrypt HTTPS)
   │
   ▼
 nginx:80
@@ -310,7 +310,7 @@ Run `./setup.sh` to generate `.env` automatically with random secrets. The relev
 | `BETTER_AUTH_URL` | Full URL of the app (`http://localhost` for dev) | No — edit manually |
 | `FRONTEND_URL` | Full URL of the app (`http://localhost` for dev) | No — edit manually |
 
-For production, set `DOMAIN`, `BETTER_AUTH_URL` and `FRONTEND_URL` to your real domain with `https://`. Caddy will obtain a Let's Encrypt certificate automatically. See [QUICKSTART.md](QUICKSTART.md) for SSL and Cloudflare setup details.
+For production with HTTPS, set `DOMAIN`, `BETTER_AUTH_URL` and `FRONTEND_URL` to your real domain and update the `Caddyfile` to remove the `http://` prefix — Caddy will then obtain a Let's Encrypt certificate automatically. See [QUICKSTART.md](QUICKSTART.md) for SSL and Cloudflare setup details.
 
 ---
 

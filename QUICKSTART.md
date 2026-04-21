@@ -90,18 +90,14 @@ Si vols mantenir el proxy de Cloudflare actiu (protecció DDoS, ocultació de la
 
 Per al mode **Flexible** (Caddy serveix HTTP):
 
+El `Caddyfile` per defecte ja usa `http://{$DOMAIN}` que força HTTP — no cal cap canvi addicional.
+
+Si per algun motiu vols fixar el port manualment:
+
 ```
-:{$PORT:80} {
+http://{$DOMAIN} {
     reverse_proxy frontend:80
 }
-```
-
-I al `docker-compose.yml`, canvia el servei `caddy` per exposar només el port 80:
-
-```yaml
-caddy:
-  ports:
-    - "80:80"
 ```
 
 **3. Configura el `.env`:**

@@ -608,8 +608,7 @@ const maxSize = import.meta.env.VITE_MAX_FILE_SIZE_MB;
 - [README.md](README.md) - General project documentation
 - [SECURITY.md](SECURITY.md) - Security policy
 - [CHANGELOG.md](CHANGELOG.md) - Change history
-- [IMPROVEMENTS.md](IMPROVEMENTS.md) - Detail of applied improvements
-- [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) - Implementation summary
+- [DESIGN.md](DESIGN.md) - Design system and Blueprint theme reference
 
 ### External Documentation
 
