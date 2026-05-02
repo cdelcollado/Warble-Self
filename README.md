@@ -12,7 +12,7 @@ Warble is a modern, open-source web application for programming amateur (ham) ra
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Platform](https://img.shields.io/badge/platform-Chrome%20|%20Edge-orange)
 ![Status](https://img.shields.io/badge/status-Beta-yellow)
-
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/cdelcollado/Warble-Self)
 ---
 
 ## ✨ Features
