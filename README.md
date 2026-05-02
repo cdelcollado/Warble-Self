@@ -368,7 +368,7 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ### Acknowledgements
 
-- [CHIRP](https://chirpmyradio.com/) — the original open-source radio programming software that inspired this project. The UV-5R MINI protocol was reverse-engineered from CHIRP's `baofeng_uv17Pro.py` driver.
+- [CHIRP](https://chirpmyradio.com/) — the original open-source radio programming software that inspired this project.
 - [RepeaterBook](https://repeaterbook.com/) — repeater database API.
 - [AG Grid](https://www.ag-grid.com/) — high-performance spreadsheet grid.
 
